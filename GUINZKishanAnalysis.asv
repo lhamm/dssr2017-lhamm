@@ -45,11 +45,12 @@ end
 ReasearchAssistants = {'KM', 'LH'};
 RANum               = centmenu('Who are you?', ReasearchAssistants);
 RA                  = ReasearchAssistants{RANum};
-FileName            = strcat(sprintf('%sAnalysisData%c',FileRoot,filesep),sprintf('DataAnalysis_%s_%s', MyDate, RA));
-%AnalysisSession     = 1; %make dynamic
-FileName            = sprintf('DataAnalysis_%s_%s', MyDate, RA);
 
-fileID              = fopen(FileName,'w');
+WhereToSave         = sprintf('%sAnalysisData%c',FileRoot,filesep);
+FileName            = sprintf('DataAnalysis_%s_%s', MyDate, RA);
+%AnalysisSession     = 1; %make dynamic
+
+fileID              = fopen('DataAnalysis.dat','w');
 formatSpec          = '%s %i %i \n';
 
 
