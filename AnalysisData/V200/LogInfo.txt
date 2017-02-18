@@ -1,0 +1,5 @@
+This was based on version 2, which looked only at detect frames.
+It went sequentially through the images, ending at 10149 mid way - continue on.
+So far most of these are very close to the bulls-eye - looks promising for changing the criteria of the subpixel analysis - likely luminance cut offs is a good place to start.
+
+LH

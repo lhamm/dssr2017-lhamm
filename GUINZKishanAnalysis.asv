@@ -106,21 +106,20 @@ try
                                 if isempty(ImageCode)
                                     MissingImageFiles=strcat(MissingImageFiles, ImageCode);
                                 else
-                                    if ~DataFile.S_Data.FrameBullsEyeDetectRecord(SeqInd, FrameLoop)
-                                        FullImageName   = strcat(FileRoot, ImageFolderName, ImageCode.name);
-                                        Im              = imread(FullImageName);
-                                        [BEResult]       = CompareDataToImGUINZ(DataFile, Im, ImageCode.name,Inter(InterLoop), Trial(TrialLoop), SeqInd, FrameLoop, PossErrorTypes,OptNames);
-                                        FrameCounter=FrameCounter+1;
-                                        close all
-                                        % do eye analysis
-                                        SimpleCode=sprintf('Obs%s_VD%03dcm_I%i_T%02d_F%04d', Obs{ObsLoop}, VD(VDLoop)*100, Inter(InterLoop), Trial(TrialLoop), FrameLoop);
-                                        EyeResult=NaN;
-                                        
-                                        %% work on
-                                        Summary{FrameCounter,1}=SimpleCode;
-                                        Summary{FrameCounter,2}=BEResult;
-                                        Summary{FrameCounter,3}=NaN;
-                                    end
+                                    FullImageName   = strcat(FileRoot, ImageFolderName, ImageCode.name);
+                                    Im              = imread(FullImageName);
+                                    [BEResult]       = CompareDataToImGUINZ(DataFile, Im, ImageCode.name,Inter(InterLoop), Trial(TrialLoop), SeqInd, FrameLoop, PossErrorTypes,OptNames);
+                                    FrameCounter=FrameCounter+1;
+                                    close all
+                                    % do eye analysis
+                                    SimpleCode=sprintf('Obs%s_VD%03dcm_I%i_T%02d_F%04d', Obs{ObsLoop}, VD(VDLoop)*100, Inter(InterLoop), Trial(TrialLoop), FrameLoop);
+                                    EyeResult=NaN;
+                                    
+                                    %% work on
+                                    Summary{FrameCounter,1}=SimpleCode;
+                                    Summary{FrameCounter,2}=BEResult;
+                                    Summary{FrameCounter,3}=NaN;
+                                    
                                     % TODO: make .csv file
                                 end %end of the if missing image part
                             end
