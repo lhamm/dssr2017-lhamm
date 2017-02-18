@@ -1,8 +1,9 @@
-function [res]=GetDataGUINZ(DestinationAfterUser1, DestinationAfterUser2, DestinationAfterUser3)
-% User name set into predefined path where data exists
-% DestimationAfterUser is a string with foldernames after user is specified
-Inputs= nargin;
+function [res]=GetPathSpecificToUser(DestinationAfterUser1, DestinationAfterUser2, DestinationAfterUser3)
+% User name set into predefined path with filesep
+% Each input is a folder name as  a string, starting after UserName, with a
+% current max of 3 - ends with a filesep!
 
+Inputs= nargin;
 UserName=getenv('username');
 
 if ~isempty(DestinationAfterUser1)

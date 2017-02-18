@@ -1,4 +1,4 @@
-function [res1, res2]   = CompareDataToImGUINZ(DataFile, Im, ImageCode, Inter, Trial, SeqInd, Frame, PossErrorTypes,OptNames)
+function [res1]   = CompareDataToImGUINZ(DataFile, Im, ImageCode, Inter, Trial, SeqInd, Frame, PossErrorTypes,OptNames)
 % inputs: dataFile from GUINZ (specific)
 % outputs - shows image and allows user input to that image
 
@@ -29,9 +29,9 @@ end
 text(10,50, sprintf('%s',Resp),'Color',RespColour)
 
 % Eye
-if DataFile.S_Data.EyeTested(Inter*Trial, Frame)==1
+if DataFile.S_Data.EyeTested(SeqInd, Frame)==1
     Eye='RE';
-elseif DataFile.S_Data.EyeTested(Inter*Trial, Frame)==0
+elseif DataFile.S_Data.EyeTested(SeqInd, Frame)==0
     Eye='LE';
 else
     Eye='ND';
@@ -45,36 +45,17 @@ end
 text(double(min(Rect(:,1))+10), double(max(Rect(:,2))+10), sprintf('%s',Eye),'Color',EyeColour);
 
 %detecting vs tracking
-if DataFile.S_Data.FrameBullsEyeDetectRecord(SeqInd, Frame)==1
+if DataFile.S_Data.FrameBullsEyeDetectRecord(SeqInd, Frame)==0
     Type='Detecting';
-elseif DataFile.S_Data.FrameBullsEyeDetectRecord(SeqInd, Frame)==0
+elseif DataFile.S_Data.FrameBullsEyeDetectRecord(SeqInd, Frame)==1
     Type='Tracking';
 else
     Type='Not sure';
 end
 text(10,10, sprintf('%s',Type),'Color','g')
 
-% maybe 'print' these things to the images, and then save the image to a matrix so that it can play in a video?
-% maybe leave this interactive part to a separate function called from main script?
-res2=1;
-NewError='Na';
-[InputBE]      = centmenu('How is the BullsEye?',{'Perfect - value looks sensible', PossErrorTypes{1:end},'Add a new option'});
-if InputBE==length(PossErrorTypes)+1
-    NewError= inputdlg('New error type', 'New Error', 1); %inputdlg(prompt,dlg_title,num_lines,defaultans);
-    [InputBE]      = centmenu('How is the BullsEye?',{'Perfect - value looks sensible', PossErrorTypes{1:end}});
-end
-
-    
-% elseif Input==2
-%     Input2=0;
-% elseif Input==3
-%     Input2=NaN;
-%     [Input3]    = centmenu('Are you sure?', {'Yes','No'});
-%     if Input3==1
-%         res2=0;
-%     end
-% end
+[InputBE]      = centmenu('How is the BullsEye?',PossErrorTypes);
 res1=InputBE;
-res2=NewError;
+
 
 

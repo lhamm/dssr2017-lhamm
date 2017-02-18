@@ -1,43 +1,67 @@
-% intro (name of program, name of authors, descriptions)
+%% This script is designed to look at saved images containing bullseyes as well as data files containing information about these images 
+
+%intro (name of program, name of authors, descriptions)
 clearvars
 close all
 
-%% initialise variables
+%% initialise 
+AnalysisVersion             = 1.3; % 1.3 = change how eyes were stored and fixed tracking/detecting numbers
+TestingVersion              = 1.0; % update as we use new data files
 
-RunDemo         = 0; %if 1, just a test, if 0, run all through
-RandGenSample   = 1;
+RunDemo                     = 0; %if 1, just a test, if 0, run all through
+RandGenSample               = 1;
 
-PossErrorTypes  = {'No Bullseye', 'BullsEye No Rect', 'BullsEye Wrong Rect', 'BullsEye No Width', 'Child Covering BullsEye'};
-OptNames        = {'Flower', 'Car', 'Butterfly','Rocket','Duck','Heart','House','Moon','Tree','Rabbit'};
+PossErrorTypes              = {'Perfect, looks sensible', 'BullsEye out of frame', 'Child obscuring bullsEye', 'BullsEye, but no rect', 'Wrong Position', 'Position Correct, no width', 'Width est, but wrong position'};
+OptNames                    = {'Flower', 'Car', 'Butterfly','Rocket','Duck','Heart','House','Moon','Tree','Rabbit'};
 
-[FileRoot]                  = GetDataGUINZ;
+FileRoot                    = GetPathSpecificToUser('Documents','GUINZData');
 [Obs, VD, Eyes, Stim]       = GetDataTypeListsGUINZ(FileRoot);
-Inter                       = 1: (length(Eyes)+length(Stim));
+MaxFrames                   = GetMaxFrames(FileRoot, Obs, '.jpg');
+Inter                       = 1:(length(Eyes)+length(Stim));
 Trial                       = 1:16;
+IndexList                   = NaN(length(Obs), MaxFrames, length(Trial), length(Inter), length(VD)); 
 
-MissingDataFiles='';
-MissingImageFiles='';
-FrameCounter=0;
+MissingDataFiles            = '';
+MissingImageFiles           = '';
+FrameCounter                = 0;
  
-InterSeq=horzcat(repmat(1,1,16), repmat(2,1,16), repmat(3,1,16), repmat(4,1,16)); 
-TrialSeq=repmat([1:16],1,4);
+InterSeq                    = horzcat(ones(1,16), repmat(2,1,16), repmat(3,1,16), repmat(4,1,16)); 
+TrialSeq                    = repmat([1:16],1,4);
 
 %% Pick List to test
+% Find combinations alredy tested
+AnalysisFileRoot            = GetPathSpecificToUser('Desktop','dssr2017-lhamm','AnalysisData');
+%load(SummaryMatrix.mat)
+AnalysisFiles               = dir(sprintf('%sDataAnalysis*.dat',AnalysisFileRoot));
+cnt=0;
+for i=1:length(AnalysisFiles)
+    try
+        a=importdata(AnalysisFiles(i).name);
+        for j=1:length(a.data);
+            b=char(a.textdata(j)) ;
+            cnt=cnt+1;
+            SumD(cnt,1)=str2double(b(4:10)); SumD(cnt,2) =str2double(b(14:16)); SumD(cnt,3) = str2double(b(21)); SumD(cnt,4) = str2double(b(24:25)); SumD(cnt,5)=a.data(j);
+        end
+    catch
+    end
+end
+
+
+
 if RunDemo
-    Obs     = Obs(12:13); %chose a number
-    VD      = VD(1); %chose a number
-    Eyes    = Eyes{1}; %chose a number
-    Stim    = Stim{1}; %chose a number
-    Inter   = 1; %chose a number....this is related to last 2...
+    Obs                     = Obs(12:13); %chose a number
+    VD                      = VD(1); %chose a number
+    Eyes                    = Eyes{1}; %chose a number
+    Stim                    = Stim{1}; %chose a number
+    Inter                   = 1; %chose a number....this is related to last 2...
 end
 
 if RandGenSample
     rng('shuffle')
-    ObsList     = randi(length(Obs),1); %need this for indexing
-    Obs         = (Obs(ObsList));
-    Inter       = randi(4,1);  %need this for indexing
-    Trial       = randi(16,1); 
-
+    ObsList                 = randi(length(Obs),1); %need this for indexing
+    Obs                     = (Obs(ObsList));
+    Inter                   = randi(4,1);  %need this for indexing
+    Trial                   = randi(16,1); 
     % use both VDs
 end
 
@@ -45,14 +69,12 @@ end
 ReasearchAssistants = {'KM', 'LH'};
 RANum               = centmenu('Who are you?', ReasearchAssistants);
 RA                  = ReasearchAssistants{RANum};
-FileName            = strcat(sprintf('%sAnalysisData%c',FileRoot,filesep),sprintf('DataAnalysis_%s_%s', MyDate, RA));
-%AnalysisSession     = 1; %make dynamic
-FileName            = sprintf('DataAnalysis_%s_%s', MyDate, RA);
+FileName            = sprintf('DataAnalysis_AVer%0.1f_TVer%0.1f_Date_%s_RA_%s.dat', AnalysisVersion, TestingVersion, MyDate, RA);
 
 fileID              = fopen(FileName,'w');
 formatSpec          = '%s %i %i \n';
 
-
+try
 %% start loop
 % TODO: make a random list for testing
     for ObsLoop=1:numel(Obs) %observers or participants who have image files
@@ -84,14 +106,11 @@ formatSpec          = '%s %i %i \n';
                                 else
                                     FullImageName   = strcat(FileRoot, ImageFolderName, ImageCode.name);
                                     Im              = imread(FullImageName);                                   
-                                    [BEResult, NewError]       = CompareDataToImGUINZ(DataFile, Im, ImageCode.name,Inter(InterLoop), Trial(TrialLoop), SeqInd, FrameLoop, PossErrorTypes,OptNames);
-                                    if ~strcmp(NewError, 'Na')
-                                       PossErrorTypes={PossErrorTypes{1:end},NewError};
-                                    end
+                                    [BEResult]       = CompareDataToImGUINZ(DataFile, Im, ImageCode.name,Inter(InterLoop), Trial(TrialLoop), SeqInd, FrameLoop, PossErrorTypes,OptNames);
                                     FrameCounter=FrameCounter+1;
                                     close all
                                     % do eye analysis
-                                    SimpleCode=sprintf('Obs%s_VD%icm_I%i_T%i_F%i', Obs{ObsLoop}, VD(VDLoop)*100, Inter(InterLoop), Trial(TrialLoop), FrameLoop);
+                                    SimpleCode=sprintf('Obs%s_VD%03dcm_I%i_T%02d_F%04d', Obs{ObsLoop}, VD(VDLoop)*100, Inter(InterLoop), Trial(TrialLoop), FrameLoop);
                                     EyeResult=NaN;
                                     
                                     %% work on
@@ -117,12 +136,13 @@ for row = 1:nrows
 end
 
 fclose(fileID);
+bar([sum(SumD(:,5)==1), sum(SumD(:,5)==2),sum(SumD(:,5)==3),sum(SumD(:,5)==4),sum(SumD(:,5)==5),sum(SumD(:,5)==6),sum(SumD(:,5)==7)])
+title(sprintf('Total Finished: %i',length(SumD)))
+catch
+bar([sum(SumD(:,5)==1), sum(SumD(:,5)==2),sum(SumD(:,5)==3),sum(SumD(:,5)==4),sum(SumD(:,5)==5),sum(SumD(:,5)==6),sum(SumD(:,5)==7)])
+title(sprintf('Total Finished: %i',length(SumD)))
+end
 
-
-
-%writetable(T, 'DataAnalysis.xlsx', 'Sheet', AnalysisSession) % sprintf('%s%s_%s %s.dat',WhereToSave, RA, MyDate, SimpleCode)); 
-%dlmwrite(sprintf('%s%s_%s O:%s I:%i T:%i.dat',WhereToSave, RA, MyDate, Obs{ObsLoop},Inter(InterLoop), Trial(TrialLoop)),Summary)
-                                    
 
 
 
