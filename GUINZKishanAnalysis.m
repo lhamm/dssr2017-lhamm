@@ -32,7 +32,7 @@ TrialSeq                    = repmat([1:16],1,4);
 %% Pick List to test
 % Find combinations alredy tested
 if LookAtFiles
-    AnalysisFileRoot            = GetPathSpecificToUser('Desktop','dssr2017-lhamm','AnalysisData');
+    AnalysisFileRoot            = GetPathSpecificToUser('Desktop','dssr2017-lhamm','AnalysisData', sprintf('%s);
     %load(SummaryMatrix.mat)
     AnalysisFiles               = dir(sprintf('%sDataAnalysis*.dat',AnalysisFileRoot));
     cnt=0;
@@ -139,15 +139,7 @@ try
     end
     
     fclose(fileID);
-    if LookAtFiles
-        bar([sum(SumD(:,5)==1), sum(SumD(:,5)==2),sum(SumD(:,5)==3),sum(SumD(:,5)==4),sum(SumD(:,5)==5),sum(SumD(:,5)==6),sum(SumD(:,5)==7)])
-        title(sprintf('Total Finished: %i',length(SumD)))
-    end
 catch
-    if LookAtFiles
-        bar([sum(SumD(:,5)==1), sum(SumD(:,5)==2),sum(SumD(:,5)==3),sum(SumD(:,5)==4),sum(SumD(:,5)==5),sum(SumD(:,5)==6),sum(SumD(:,5)==7)])
-        title(sprintf('Total Finished: %i',length(SumD)))
-    end
 end
 
 
