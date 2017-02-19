@@ -3,7 +3,7 @@ function k = centmenu(xHeader,varargin)
 % created by Phil Turnbull 10/2015 to make menu.m better, faster, stronger,
 % and better for touch and mouse input. 
 % varargin can be list of strings, or cell arrays 
-%       k = centmenu('Phil is awesome?','Yes','No','Perhaps')
+%       k = centmenu('Phil is awesome','Yes','No','Perhaps')
 %       %creates a figure with buttons labeled 'Yes', 'No' and 'Perhaps'
 %       %Returned as k (i.e. k = 2 implies that the user (incorrectly) selected No).
 

@@ -12,8 +12,16 @@ RunDemo                     = 0; %if 1, just a test, if 0, run all through
 RandGenSample               = 0;
 LookAtFiles                 = 0; %if 1 will show a summary so far
 
-PossErrorTypes              = {'Perfect, looks sensible', 'BullsEye out of frame', 'Child obscuring bullsEye', 'BullsEye, but no rect', 'Wrong Position', 'Position Correct, no width', 'Width est, but wrong position'};
-OptNames                    = {'Flower', 'Car', 'Butterfly','Rocket','Duck','Heart','House','Moon','Tree','Rabbit'};
+%% initialise variables
+
+RunDemo                      = 0; %if 1, just a test, if 0, run all through
+RandGenSample                = 1;
+
+dependentvar                 = 'Possible Errors';
+independentvar               = 'Proportion';
+PossErrorTypes               = {'Perfect, looks sensible', 'BullsEye out of frame', 'Child obscuring bullsEye', 'BullsEye, but no rect', 'Wrong Position', 'Position Correct, no width', 'Width est, but wrong position'};
+
+OptNames                     = {'Flower', 'Car', 'Butterfly','Rocket','Duck','Heart','House','Moon','Tree','Rabbit'};
 
 FileRoot                    = GetPathSpecificToUser('Documents','GUINZData');
 [Obs, VD, Eyes, Stim]       = GetDataTypeListsGUINZ(FileRoot);
@@ -21,6 +29,7 @@ MaxFrames                   = GetMaxFrames(FileRoot, Obs, '.jpg');
 Inter                       = 1:(length(Eyes)+length(Stim));
 Trial                       = 1:16;
 IndexList                   = NaN(length(Obs), MaxFrames, length(Trial), length(Inter), length(VD));
+
 
 MissingDataFiles            = '';
 MissingImageFiles           = '';
@@ -106,6 +115,7 @@ try
                                 if isempty(ImageCode)
                                     MissingImageFiles=strcat(MissingImageFiles, ImageCode);
                                 else
+                                    %%LIsaTODO - make strategy dynamic
                                     if ~DataFile.S_Data.FrameBullsEyeDetectRecord(SeqInd, FrameLoop)
                                         FullImageName   = strcat(FileRoot, ImageFolderName, ImageCode.name);
                                         Im              = imread(FullImageName);
