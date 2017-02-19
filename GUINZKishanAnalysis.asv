@@ -11,8 +11,7 @@ RandGenSample   = 1;
 
 dependentvar    = 'Possible Errors';
 independentvar  = 'Proportion';
-
-
+xfeat.FontSize  = 30
 
 PossErrorTypes  = {'No Bullseye', 'BullsEye No Rect', 'BullsEye Wrong Rect', 'BullsEye No Width', 'Child Covering BullsEye'};
 OptNames        = {'Flower', 'Car', 'Butterfly','Rocket','Duck','Heart','House','Moon','Tree','Rabbit'};
