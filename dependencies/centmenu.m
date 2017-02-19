@@ -15,7 +15,7 @@ if nargin < 2,
 elseif nargin==2 && iscell(varargin{1}) && ~isempty(varargin{1}),
   ArgsIn = varargin{1}; % a cell array was passed in - this should usually be the case!
 elseif nargin==2 && iscell(varargin{1}) && isempty(varargin{1}), %cell array passed, but empty - probably shouldn't be... 
-    disp(getString(message('MATLAB:uistring:menu:NoMenuItemsToChooseFrom')))
+    fprintf(1, 'Error: Proper usage is: k = centmenu(''Phil is awesome?'',''Yes'',''No'',''Perhaps'')\n');
     k=0;
     return;
 else
