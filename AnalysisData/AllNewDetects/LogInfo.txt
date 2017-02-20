@@ -3,3 +3,44 @@ It went sequentially through the images, ending at 10149 mid way - continue on.
 So far most of these are very close to the bulls-eye - looks promising for changing the criteria of the subpixel analysis - likely luminance cut offs is a good place to start.
 
 LH
+
+Finished this for all participants on feb 20, 2:30 ish
+
+can run analysis by:
+AllNewDetects               = 1;
+
+StrategyList                = {'SpecificSample', 'RandomGenSample', 'AllNewDetects'};
+if SpecificSample
+    Strategy                = 1;
+elseif RandGenSample
+    Strategy                = 2;
+elseif AllNewDetects
+    Strategy                = 3;
+end
+
+LookAtFiles                 = 1; %if 1 will show a summary so far
+
+
+ AnalysisFileRoot            = GetPathSpecificToUser('Desktop','dssr2017-lhamm','AnalysisData', sprintf('%s',StrategyList{Strategy})); %LISATODO: add one more variable for testing strategy
+    AnalysisFiles               = dir(sprintf('%sDataAnalysis*.dat',AnalysisFileRoot));
+    cnt=0;
+    clear i
+    for i=1:length(AnalysisFiles)
+        %try
+        a=importdata(AnalysisFiles(i).name);
+        for j=1:length(a.data);
+            b=char(a.textdata(j)) ;
+            cnt=cnt+1;
+            SumD(cnt,1)=str2double(b(4:10)); SumD(cnt,2) =str2double(b(14:16)); SumD(cnt,3) = str2double(b(21)); SumD(cnt,4) = str2double(b(24:25)); SumD(cnt,5)=a.data(j);
+        end
+        %catch
+        %end
+    end
+
+%% Plot!
+if LookAtFiles
+    AllResults          = [sum(SumD(:,5)==1), sum(SumD(:,5)==2), sum(SumD(:,5)==3), sum(SumD(:,5)==4), sum(SumD(:,5)==5), sum(SumD(:,5)==6), sum(SumD(:,5)==7)];
+    TotalFramesOverTime = sum(AllResults);
+    Proportion          = AllResults/TotalFramesOverTime;
+    labelledBar(PossErrorTypes, Proportion, independentvar, dependentvar)
+end
