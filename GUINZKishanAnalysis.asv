@@ -47,7 +47,6 @@ if LookAtFiles
     AnalysisFileRoot            = GetPathSpecificToUser('Desktop','dssr2017-lhamm','AnalysisData', sprintf('%s',StrategyList{Strategy})); %LISATODO: add one more variable for testing strategy
     AnalysisFiles               = dir(sprintf('%sDataAnalysis*.dat',AnalysisFileRoot));
     cnt=0;
-    clear i
     for i=1:length(AnalysisFiles)
         %try
             a=importdata(AnalysisFiles(i).name);
@@ -131,14 +130,26 @@ formatSpec          = '%s %i %i \n';
                                     %%LIsaTODO - make strategy dynamic
                                     if AllNewDetects
                                         if ~DataFile.S_Data.FrameBullsEyeDetectRecord(SeqInd, FrameLoop)
-                                            FullImageName       = strcat(FileRoot, ImageFolderName, ImageCode.name);
-                                            Im                  = imread(FullImageName);
-                                            [BEResult]          = CompareDataToImGUINZ(DataFile, Im, ImageCode.name,Inter(InterLoop), Trial(TrialLoop), SeqInd, FrameLoop, PossErrorTypes,OptNames);
+                                            FullImageName   = strcat(FileRoot, ImageFolderName, ImageCode.name);
+                                            Im              = imread(FullImageName);
+                                            [BEResult]       = CompareDataToImGUINZ(DataFile, Im, ImageCode.name,Inter(InterLoop), Trial(TrialLoop), SeqInd, FrameLoop, PossErrorTypes,OptNames);
+                                            FrameCounter=FrameCounter+1;
+                                            close all
+                                            % do eye analysis
+                                            SimpleCode=sprintf('Obs%s_VD%03dcm_I%i_T%02d_F%04d', Obs{ObsLoop}, VD(VDLoop)*100, Inter(InterLoop), Trial(TrialLoop), FrameLoop);
+                                            EyeResult=NaN;
+                                            
+                                            %% work on
+                                            Summary{FrameCounter,1}=SimpleCode;
+                                            Summary{FrameCounter,2}=BEResult;
+                                            Summary{FrameCounter,3}=NaN;
                                         end
                                     else
                                     FullImageName   = strcat(FileRoot, ImageFolderName, ImageCode.name);
                                     Im              = imread(FullImageName);
                                     [BEResult]       = CompareDataToImGUINZ(DataFile, Im, ImageCode.name,Inter(InterLoop), Trial(TrialLoop), SeqInd, FrameLoop, PossErrorTypes,OptNames);
+
+
                                     end
                                     FrameCounter=FrameCounter+1;
                                     close all
