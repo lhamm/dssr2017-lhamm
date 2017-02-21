@@ -14,7 +14,8 @@ function labelledBar(xLabels, yValues, independentvar, dependentvar)
     %(double)
     %                   - NOTE: Heading will be same size
 
-
+figure('Units','normalized', 'Position',[0.05 0.3 0.9 0.5],'Name','Results','Color',[1 1 1])
+    
 bar (yValues,'FaceColor',[1 0 0]); %Bar Graph Values in Red
 set(gca,'XTickLabel',xLabels);
 titlefeat           = title ([independentvar, ' vs. ' dependentvar]);

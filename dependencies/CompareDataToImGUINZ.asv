@@ -10,16 +10,8 @@ Rect=cell2mat(DataFile.S_Data.PositionOfBullsEyeInFrame(SeqInd, Frame));
 %[x y w h]
 rectangle('Position',[Rect(1,1),Rect(1,2), (max(Rect(:,1))-min(Rect(:,1))), (max(Rect(:,2))-min(Rect(:,2)))],'LineWidth',2, 'EdgeColor','r');
 text(double(min(Rect(:,1))+5), double(min(Rect(:,2))-10), sprintf('%0.1f',DataFile.S_Data.FrameBullsEyeWidthRecord(SeqInd, Frame)),'Color','r')
-% 
-% if DataFile.S_Admin.ViewingDistanceInM==0.4;
-%     Resolution=640;
-% elseif DataFile.S_Admin.ViewingDistanceInM==1.5;
-%     Resolution=1920;
-% end  
-% 
-% EstimatedVD=calcWD(DataFile.S_Data.FrameBullsEyeWidthRecord(SeqInd, Frame), 3.4, Resolution, 76);
-% text(double(min(Rect(:,1))+25), double(min(Rect(:,2))-10), sprintf('%0.1f',EstimatedVD+2),'Color','r') %plus 2 because of the gap between eye and glasses 
-% 
+Resolution=[640 1920];
+VD=calcWD(DataFile.S_Data.FrameBullsEyeWidthRecord(SeqInd, Frame), 3.4, Resolution(
 
 %text(0,100, ImageCode,'Color','b');
 %What is the child seeing on the screen

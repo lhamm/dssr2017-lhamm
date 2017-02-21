@@ -9,6 +9,10 @@ Notes:
 2) earlier versions had slightly different options - these are an improvement - may want to break down 'wrong rect' further 
 
 To see results in this folder, can use:
+
+independentvar = 'Possible Errors'
+dependentvar   =  'Proportion'
+
 for i=1:length(AnalysisFiles)
     try
         a=importdata(AnalysisFiles(i).name);
@@ -20,3 +24,8 @@ for i=1:length(AnalysisFiles)
     catch
     end
 end
+
+    AllResults          = [sum(SumD(:,5)==1), sum(SumD(:,5)==2), sum(SumD(:,5)==3), sum(SumD(:,5)==4), sum(SumD(:,5)==5), sum(SumD(:,5)==6), sum(SumD(:,5)==7)];
+    TotalFramesOverTime = sum(AllResults);
+    Proportion          = AllResults/TotalFramesOverTime;
+    labelledBar(PossErrorTypes, Proportion, independentvar, dependentvar)
