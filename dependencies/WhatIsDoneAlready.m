@@ -13,6 +13,7 @@ function [SumD] = WhatIsDoneAlready(Strategy, StrategyList)
                 cnt=cnt+1;
                 SumD(cnt,1)=str2double(b(4:10)); SumD(cnt,2) =str2double(b(14:16)); SumD(cnt,3) = str2double(b(21)); SumD(cnt,4) = str2double(b(24:25)); SumD(cnt,5)=a.data(j);
                 SumD=sort(SumD);
+                % categorize with BullsEye or Eye here
             end
         catch
         end

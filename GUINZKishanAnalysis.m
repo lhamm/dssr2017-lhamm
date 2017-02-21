@@ -11,7 +11,7 @@ Done=0;
 AnalysisVersion     = 2.1; %2.1=eye analysis added in; 1.3 = change how eyes were stored and fixed tracking/detecting numbers
 TestingVersion      = 1.0; % update as we use new data files
 
-LookAtFiles         = 1; %if 1 will show a summary so far
+LookAtFiles         = 0; %if 1 will show a summary so far
 
 %% Ask user for input
 ReasearchAssistants = {'KM', 'LH'};
@@ -48,7 +48,8 @@ FrameCounter                = 0;
 Summary                     = cell(1,3);
 
 %% Look at existing files
-% Find combinations alredy tested
+% Find combinations alredy tested - LISATODO: look for only BE or Eye type
+% data
 if LookAtFiles
     SumD                    = WhatIsDoneAlready(Strategy, StrategyList);
 end
@@ -101,7 +102,7 @@ if ~Done
             else
                 DataFile        = open(strcat(sprintf('%sDataFiles%c',FileRoot, filesep),(flist(1).name)));
                 for InterLoop=1:length(Inter) %Test: RE regular, RE vanishing, LE Regular, LE vanishing
-                    if Strategy==3
+                    if Strategy==1||Strategy==2
                         TrialNo=length(Trial);
                     else
                         TrialNo=length(DataFile.S_Data.SizeDisplayed(Inter(InterLoop),:)); %number of trials in that test
