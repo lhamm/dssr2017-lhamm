@@ -18,11 +18,11 @@ if WebCamTracking
         % resolution is related to clip (now should all be the same)
         
         if strcmp('640x360',cam.Resolution)
-            PixelsPerDegreeOfIm=8.4434; %calibrated from measurement Estimate is 640/80 (8); %this camera has a field of view of 80 degrees
+            PixelsPerDegreeOfIm=8.4434; %calibrated from measurement. Estimate is 640/80 (8); %this camera has a field of view of 80 degrees
         elseif strcmp('1280x720',cam.Resolution)
             PixelsPerDegreeOfIm=1280/80; %this camera has a field of view of 80 degrees
         elseif strcmp('1920x1080',cam.Resolution)
-            PixelsPerDegreeOfIm=25.2537; %calibrated from measurement %1920/80 - 24; %this camera has a field of view of 80 degrees
+            PixelsPerDegreeOfIm=25.2537; %calibrated from measurement. %1920/80 - 24; %this camera has a field of view of 80 degrees
         end
         %calculations of size and area in cm, and degrees
         SizeOfSmallTarget=1.1; %cm - in real life

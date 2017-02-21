@@ -81,16 +81,20 @@ elseif Strategy==3 || Strategy==4
     end
 end %default is to go through all of them
 
-if ~Done  
+if ~Done
+    
+    
+    
     %% set up log file for test run
     FileName            = sprintf('DataAnalysis_%i_AVer%0.1f_TVer%0.1f_Date_%s_RA_%s.dat', Strategy, AnalysisVersion, TestingVersion, MyDate, RA);
-    % LISATODO: currently displays in the location you ran it from - try to move to
+    % currently displays in the location you ran it from - try to move to
     % LISATODO: add a log file with missing data and other notes
     fileID              = fopen(FileName,'w');
     formatSpec          = '%s %i %i \n';
     
     %try
     %% start loop
+    % TODO: make a random list for testing
     for ObsLoop=1:numel(Obs) %observers or participants who have image files
         ImageFolderName=sprintf('%s%c',Obs{ObsLoop},filesep);
         for VDLoop=1:length(VD); %viewing distance
