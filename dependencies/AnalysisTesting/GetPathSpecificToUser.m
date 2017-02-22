@@ -14,15 +14,18 @@ if Inputs>=2
     if ~isempty(DestinationAfterUser2)
         FileRoot=sprintf('%s%s%c',FileRoot, DestinationAfterUser2, filesep);
     end
-elseif Inputs>=3
+end
+if Inputs>=3
     if ~isempty(DestinationAfterUser3) && exist('DestinationAfterUser3','var')
         FileRoot=sprintf('%s%s%c',FileRoot, DestinationAfterUser3, filesep);
     end
-elseif Inputs>=4
+end
+if Inputs>=4
     if ~isempty(DestinationAfterUser4) && exist('DestinationAfterUser4','var')
         FileRoot=sprintf('%s%s%c',FileRoot, DestinationAfterUser4, filesep);
     end
 end
+
 
 
 

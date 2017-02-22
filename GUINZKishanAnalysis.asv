@@ -36,12 +36,11 @@ end
 OptNames                    = {'Flower', 'Car', 'Butterfly','Rocket','Duck','Heart','House','Moon','Tree','Rabbit'};
 FileRoot                    = GetPathSpecificToUser('Documents','GUINZData');
 [Obs, VD, Eyes, Stim]       = GetDataTypeListsGUINZ(FileRoot);
+AllCombinations             = allcomb(str2double(Obs), VD*100, Inter, Trial);
+
+MaxFrames                   = GetMaxFrames(FileRoot, Obs, '.jpg');
 Inter                       = 1:(length(Eyes)+length(Stim));
 Trial                       = 1:16;
-
-AllCombinations             = allcomb(str2double(Obs), VD*100, Inter, Trial);
-MaxFrames                   = GetMaxFrames(FileRoot, Obs, '.jpg');
-
 IndexList                   = NaN(length(Obs), MaxFrames, length(Trial), length(Inter), length(VD));
 InterSeq                    = horzcat(ones(1,16), repmat(2,1,16), repmat(3,1,16), repmat(4,1,16));
 TrialSeq                    = repmat([1:16],1,4);
@@ -52,9 +51,10 @@ Summary                     = cell(1,3);
 
 %% Look at existing files
 % Find combinations alredy tested - LISATODO: look for only BE or Eye type
-[SumD, SumDUnique]          = WhatIsDoneAlready(Strategy, StrategyList);
-NewCombinationList          = WhatIsLeftToDo(AllCombinations,SumDUnique); 
-    
+% data
+%if LookAtFiles
+    SumD                    = WhatIsDoneAlready(Strategy, StrategyList);
+%end
 
 %% get new list of images to test LISATODO: make this into a function
 [Obs, VD, Inter, Trial, Done]     = ChooseFramesToTest(Strategy, SumD);
