@@ -5,13 +5,11 @@ clearvars
 close all
 format long g
 rng('shuffle')
-Done=0;
 
 %% initialise frequently changing variables
 AnalysisVersion     = 2.1; %2.1=eye analysis added in; 1.3 = change how eyes were stored and fixed tracking/detecting numbers
 TestingVersion      = 1.0; % update as we use new data files
-
-LookAtFiles         = 0; %if 1 will show a summary so far
+LookAtFiles         = 1; %if 1 will show a summary so far
 
 %% Ask user for input
 ReasearchAssistants = {'KM', 'LH'};
@@ -24,6 +22,9 @@ DorE                = DistanceOrEye{DorENum};
 
 StrategyList        = {'SpecificSample', 'RandGenSample', 'AllNewDetects','OnlyWhenEyeDetected'};
 Strategy            = centmenu('What strategy do tyou want to take?', StrategyList);
+if Strategy>1
+    NumberOfTrials      = centmenu('How many trials do you want to code?', {'1','2','3','4','5','6','7','8','9','10'});
+end
 
 if DorENum==1;
     PossErrorTypes  = {'Perfect, looks sensible', 'BullsEye out of frame', 'Child obscuring bullsEye', 'BullsEye, but no rect', 'Wrong Position', 'Position OK, no width', 'Width est, wrong position'};
@@ -33,60 +34,26 @@ end
 
 
 %% initialise variables
-OptNames                    = {'Flower', 'Car', 'Butterfly','Rocket','Duck','Heart','House','Moon','Tree','Rabbit'};
 FileRoot                    = GetPathSpecificToUser('Documents','GUINZData');
 [Obs, VD, Eyes, Stim]       = GetDataTypeListsGUINZ(FileRoot);
-Inter                       = 1:(length(Eyes)+length(Stim));
-Trial                       = 1:16;
-
-AllCombinations             = allcomb(str2double(Obs), VD*100, Inter, Trial);
+AllCombinations             = allcomb(str2double(Obs), VD*100, 1:4, 1:16);
 MaxFrames                   = GetMaxFrames(FileRoot, Obs, '.jpg');
 
-IndexList                   = NaN(length(Obs), MaxFrames, length(Trial), length(Inter), length(VD));
+OptNames                    = {'Flower', 'Car', 'Butterfly','Rocket','Duck','Heart','House','Moon','Tree','Rabbit'};
 InterSeq                    = horzcat(ones(1,16), repmat(2,1,16), repmat(3,1,16), repmat(4,1,16));
 TrialSeq                    = repmat([1:16],1,4);
-MissingDataFiles            = ''; %lisaTODO: save missing files to a log of some kind
-MissingImageFiles           = ''; %lisaTODO: save missing files to a log of some kind
+MissingDataFiles            = ''; %LISATODO: save missing files to a log of some kind
+MissingImageFiles           = ''; %LISATODO: save missing files to a log of some kind
+Done                        = 0;
 FrameCounter                = 0;
 Summary                     = cell(1,3);
 
-%% Look at existing files
-% Find combinations alredy tested - LISATODO: look for only BE or Eye type
-[SumD, SumDUnique]          = WhatIsDoneAlready(Strategy, StrategyList);
-NewCombinationList          = WhatIsLeftToDo(AllCombinations,SumDUnique); 
-    
+%% Look at existing files and choose new ones
+[SumD, SumDUnique]          = WhatIsDoneAlready(Strategy, StrategyList, DorENum); %LISATODO: look for only BE or Eye type wihtin this function
+NewCombinationList          = WhatIsLeftToDo(AllCombinations,SumDUnique); % LISATODO - deal with case - you're done!
+[Obs, VD, Inter, Trial]     = ChooseFramesToTest(NewCombinationList, Strategy, NumberOfTrials);
 
-%% get new list of images to test LISATODO: make this into a function
-[Obs, VD, Inter, Trial, Done]     = ChooseFramesToTest(Strategy, SumD);
-% 
-% if Strategy==1 %chose which files you want to look at
-%     Obs                     = Obs(12:13); %chose a number
-%     VD                      = VD(1); %chose a number
-%     Eyes                    = Eyes{1}; %chose a number
-%     Stim                    = Stim{1}; %chose a number
-%     Inter                   = 1; %chose a number....this is related to last 2...
-% elseif Strategy==2 %LISATODO: use information from what we already have rather than truely random
-%     ObsList                 = randi(length(Obs),1); %need this for indexing
-%     Obs                     = (Obs(ObsList));
-%     Inter                   = randi(4,1);  %need this for indexing
-%     Trial                   = randi(16,1);
-%     % use both VDs
-%     % write something so that it does not do files which are already done -
-%     % tricky because random....think about this
-% elseif Strategy==3 || Strategy==4
-%     if LookAtFiles
-%         lastFile=SumD(end,1:4); %these are in order, so let's find the last one we were working on
-%         ind=find(str2double(Obs)==lastFile(1,1));
-%         if ind>=length(Obs)-1;
-%             centmenu('You are done!!',{'woohoo'})
-%             Done=1;
-%         else
-%             Obs=Obs(ind+1:ind+2); % make Obs now only be that file on (assuming it was incomplete)
-%         end
-%     end
-% end %default is to go through all of them
-
-if ~Done  
+if ~Done
     %% set up log file for test run
     FileName            = sprintf('DataAnalysis_%i_AVer%0.1f_TVer%0.1f_Date_%s_RA_%s.dat', Strategy, AnalysisVersion, TestingVersion, MyDate, RA);
     % LISATODO: currently displays in the location you ran it from - try to move to
@@ -96,64 +63,110 @@ if ~Done
     
     %try
     %% start loop
-    for ObsLoop=1:numel(Obs) %observers or participants who have image files
-        ImageFolderName=sprintf('%s%c',Obs{ObsLoop},filesep);
-        for VDLoop=1:length(VD); %viewing distance
-            DataCode        = sprintf('%sDataFiles%c%sVD%0.1f_*.mat ',FileRoot, filesep, Obs{ObsLoop},VD(VDLoop));
-            flist           = dir(DataCode);
-            if isempty(flist)
-                MissingDataFiles=strcat(MissingDataFiles, DataCode);
-            else
-                DataFile        = open(strcat(sprintf('%sDataFiles%c',FileRoot, filesep),(flist(1).name)));
-                for InterLoop=1:length(Inter) %Test: RE regular, RE vanishing, LE Regular, LE vanishing
-                    if Strategy==1||Strategy==2
-                        TrialNo=length(Trial);
-                    else
-                        TrialNo=length(DataFile.S_Data.SizeDisplayed(Inter(InterLoop),:)); %number of trials in that test
-                    end
-                    for TrialLoop=1:TrialNo;
-                        % do pal fits and bootstrapping to get acuity and reliability data
-                        SeqTrialInd=find(TrialSeq==Trial(TrialLoop));
-                        SeqInd=SeqTrialInd(Inter(InterLoop));
-                        MaxFrameNumberPerTrial=find(diff(~isnan(DataFile.S_Data.FrameTimingRecord(SeqInd,:)))==(-1)); %or sum(~isnan(DataFile.S_Data.FrameTimingRecord(InterLoop*TrialLoop,:)));
-                        for FrameLoop=1:MaxFrameNumberPerTrial %need data file not image yet- linking to image later
-                            if mod(FrameLoop, 6)==0 %every 6th frame we took an image
-                                ImageCode       = dir(strcat(FileRoot, ImageFolderName,sprintf('%s_%0.1f_%i_%i_%i_*.jpg', Obs{ObsLoop}, VD(VDLoop), Inter(InterLoop), Trial(TrialLoop)-1, FrameLoop)));
-                                if isempty(ImageCode)
-                                    MissingImageFiles=strcat(MissingImageFiles, ImageCode);
-                                else
-                                    %%LisaTODO - tidy up flow here...
-                                    if Strategy==3;
-                                        if ~DataFile.S_Data.FrameBullsEyeDetectRecord(SeqInd, FrameLoop)
-                                            FullImageName       = strcat(FileRoot, ImageFolderName, ImageCode.name);
-                                            Im                  = imread(FullImageName);
-                                            [Result]            = CompareDataToImGUINZ(DataFile, Im, ImageCode.name,Inter(InterLoop), Trial(TrialLoop), SeqInd, FrameLoop, PossErrorTypes,OptNames);
-                                            SimpleCode=sprintf('Obs%s_VD%03dcm_I%i_T%02d_F%04d', Obs{ObsLoop}, VD(VDLoop)*100, Inter(InterLoop), Trial(TrialLoop), FrameLoop);
-                                            [Summary, FrameCounter] = MakeGUINZSummary(Summary,Result, SimpleCode, DorENum, FrameCounter);
-                                        end
-                                    elseif Strategy==4 %looking at eyes
-                                        if ~isnan(DataFile.S_Data.EyeTested(SeqInd, FrameLoop)) %&& ~DataFile.S_Data.FrameBullsEyeDetectRecord(SeqInd, FrameLoop) %eye estimate there and new detect
-                                            FullImageName       = strcat(FileRoot, ImageFolderName, ImageCode.name);
-                                            Im                  = imread(FullImageName);
-                                            [Result]            = CompareDataToImGUINZ(DataFile, Im, ImageCode.name,Inter(InterLoop), Trial(TrialLoop), SeqInd, FrameLoop, PossErrorTypes,OptNames);
-                                            SimpleCode=sprintf('Obs%s_VD%03dcm_I%i_T%02d_F%04d', Obs{ObsLoop}, VD(VDLoop)*100, Inter(InterLoop), Trial(TrialLoop), FrameLoop);
-                                            [Summary, FrameCounter] = MakeGUINZSummary(Summary, Result, SimpleCode, DorENum, FrameCounter);
-                                        end
-                                    else % specified file, or randomly selected file
-                                        FullImageName           = strcat(FileRoot, ImageFolderName, ImageCode.name);
-                                        Im                      = imread(FullImageName);
-                                        [Result]                = CompareDataToImGUINZ(DataFile, Im, ImageCode.name,Inter(InterLoop), Trial(TrialLoop), SeqInd, FrameLoop, PossErrorTypes,OptNames);
-                                        SimpleCode              = sprintf('Obs%s_VD%03dcm_I%i_T%02d_F%04d', Obs{ObsLoop}, VD(VDLoop)*100, Inter(InterLoop), Trial(TrialLoop), FrameLoop);
-                                        [Summary, FrameCounter] = MakeGUINZSummary(Summary, Result, SimpleCode, DorENum, FrameCounter);
-                                    end
-                                end %of the if missing image part
-                            end
+    for i=1:NumberOfTrials
+        ImageFolderName                         = sprintf('%s%c',Obs{i},filesep);
+        DataCode                                = sprintf('%sDataFiles%c%sVD%0.1f_*.mat ',FileRoot, filesep, Obs{i},VD(i));
+        flist                                   = dir(DataCode);
+        if isempty(flist)
+            MissingDataFiles                    = strcat(MissingDataFiles, DataCode);
+        else
+            DataFile                            = open(strcat(sprintf('%sDataFiles%c',FileRoot, filesep),(flist(1).name)));
+            SeqTrialInd                         = find(TrialSeq==Trial(i));
+            SeqInd                              = SeqTrialInd(Inter(i));
+            MaxFrameNumberPerTrial              = find(diff(~isnan(DataFile.S_Data.FrameTimingRecord(SeqInd,:)))==(-1)); %or sum(~isnan(DataFile.S_Data.FrameTimingRecord(InterLoop*TrialLoop,:)));
+            FrameList                           = 6:6:MaxFrameNumberPerTrial;
+            for j=1:length(FrameList) %can't do this because  we need a 1 by 1 counter from frames - do it like before instead.
+                ImageCode                       = dir(strcat(FileRoot, ImageFolderName,sprintf('%s_%0.1f_%i_%i_%i_*.jpg', Obs{i}, VD(i), Inter(i), Trial(i)-1, FrameList(j))));
+                if isempty(ImageCode)
+                    MissingImageFiles           = strcat(MissingImageFiles, ImageCode);
+                else
+                    if Strategy==1 || Strategy==2
+                        FullImageName           = strcat(FileRoot, ImageFolderName, ImageCode.name);
+                    elseif Strategy==3 %only load if a new detect
+                        if ~DataFile.S_Data.FrameBullsEyeDetectRecord(SeqInd, FrameLoop) %in detect mode - check Frame and FrameLoop in these.....
+                            FullImageName      = strcat(FileRoot, ImageFolderName, ImageCode.name);
+                        else
+                            FullImageName      = 'NA';
+                        end
+                    elseif Strategy==4 %only load if a it has estimated an eye, and it is a new detect
+                        if ~isnan(DataFile.S_Data.EyeTested(SeqInd, FrameLoop)) %&& ~DataFile.S_Data.FrameBullsEyeDetectRecord(SeqInd, FrameLoop) %eye estimate there and new detect
+                            FullImageName       = strcat(FileRoot, ImageFolderName, ImageCode.name);
+                        else
+                            FullImageName      = 'NA';
                         end
                     end
+                    if ~strcmp(FullImageName, 'NA')
+                        Im                      = imread(FullImageName);
+                        [Result]                = CompareDataToImGUINZ(DataFile, Im, ImageCode.name,Inter(i), Trial(i), SeqInd, FrameList(j), PossErrorTypes,OptNames);
+                        SimpleCode              = sprintf('Obs%s_VD%03dcm_I%i_T%02d_F%04d', Obs{i}, VD(i)*100, Inter(i), Trial(i), FrameList(j));
+                        [Summary, FrameCounter] = MakeGUINZSummary(Summary,Result, SimpleCode, DorENum, FrameCounter);
+                    end
                 end
-            end %end of if missing data
+            end
         end
     end
+    %%
+    
+    
+    
+    %     for ObsLoop=1:numel(Obs) %observers or participants who have image files
+    %         ImageFolderName=sprintf('%s%c',Obs{ObsLoop},filesep);
+    %         for VDLoop=1:length(VD); %viewing distance
+    %             DataCode        = sprintf('%sDataFiles%c%sVD%0.1f_*.mat ',FileRoot, filesep, Obs{ObsLoop},VD(VDLoop));
+    %             flist           = dir(DataCode);
+    %             if isempty(flist)
+    %                 MissingDataFiles=strcat(MissingDataFiles, DataCode);
+    %             else
+    %                 DataFile        = open(strcat(sprintf('%sDataFiles%c',FileRoot, filesep),(flist(1).name)));
+    %                 for InterLoop=1:length(Inter) %Test: RE regular, RE vanishing, LE Regular, LE vanishing
+    %                     if Strategy==1||Strategy==2
+    %                         TrialNo=length(Trial);
+    %                     else
+    %                         TrialNo=length(DataFile.S_Data.SizeDisplayed(Inter(InterLoop),:)); %number of trials in that test
+    %                     end
+    %                     for TrialLoop=1:TrialNo;
+    %                         % do pal fits and bootstrapping to get acuity and reliability data
+    %                         SeqTrialInd=find(TrialSeq==Trial(TrialLoop));
+    %                         SeqInd=SeqTrialInd(Inter(InterLoop));
+    %                         MaxFrameNumberPerTrial=find(diff(~isnan(DataFile.S_Data.FrameTimingRecord(SeqInd,:)))==(-1)); %or sum(~isnan(DataFile.S_Data.FrameTimingRecord(InterLoop*TrialLoop,:)));
+    %                         for FrameLoop=1:MaxFrameNumberPerTrial %need data file not image yet- linking to image later
+    %                             if mod(FrameLoop, 6)==0 %every 6th frame we took an image
+    %                                 ImageCode       = dir(strcat(FileRoot, ImageFolderName,sprintf('%s_%0.1f_%i_%i_%i_*.jpg', Obs{ObsLoop}, VD(VDLoop), Inter(InterLoop), Trial(TrialLoop)-1, FrameLoop)));
+    %                                 if isempty(ImageCode)
+    %                                     MissingImageFiles=strcat(MissingImageFiles, ImageCode);
+    %                                 else
+    %                                     %%LisaTODO - tidy up flow here...
+    %                                     if Strategy==3;
+    %                                         if ~DataFile.S_Data.FrameBullsEyeDetectRecord(SeqInd, FrameLoop)
+    %                                             FullImageName       = strcat(FileRoot, ImageFolderName, ImageCode.name);
+    %                                             Im                  = imread(FullImageName);
+    %                                             [Result]            = CompareDataToImGUINZ(DataFile, Im, ImageCode.name,Inter(InterLoop), Trial(TrialLoop), SeqInd, FrameLoop, PossErrorTypes,OptNames);
+    %                                             SimpleCode=sprintf('Obs%s_VD%03dcm_I%i_T%02d_F%04d', Obs{ObsLoop}, VD(VDLoop)*100, Inter(InterLoop), Trial(TrialLoop), FrameLoop);
+    %                                             [Summary, FrameCounter] = MakeGUINZSummary(Summary,Result, SimpleCode, DorENum, FrameCounter);
+    %                                         end
+    %                                     elseif Strategy==4 %looking at eyes
+    %                                         if ~isnan(DataFile.S_Data.EyeTested(SeqInd, FrameLoop)) %&& ~DataFile.S_Data.FrameBullsEyeDetectRecord(SeqInd, FrameLoop) %eye estimate there and new detect
+    %                                             FullImageName       = strcat(FileRoot, ImageFolderName, ImageCode.name);
+    %                                             Im                  = imread(FullImageName);
+    %                                             [Result]            = CompareDataToImGUINZ(DataFile, Im, ImageCode.name,Inter(InterLoop), Trial(TrialLoop), SeqInd, FrameLoop, PossErrorTypes,OptNames);
+    %                                             SimpleCode=sprintf('Obs%s_VD%03dcm_I%i_T%02d_F%04d', Obs{ObsLoop}, VD(VDLoop)*100, Inter(InterLoop), Trial(TrialLoop), FrameLoop);
+    %                                             [Summary, FrameCounter] = MakeGUINZSummary(Summary, Result, SimpleCode, DorENum, FrameCounter);
+    %                                         end
+    %                                     else % specified file, or randomly selected file
+    %                                         FullImageName           = strcat(FileRoot, ImageFolderName, ImageCode.name);
+    %                                         Im                      = imread(FullImageName);
+    %                                         [Result]                = CompareDataToImGUINZ(DataFile, Im, ImageCode.name,Inter(InterLoop), Trial(TrialLoop), SeqInd, FrameLoop, PossErrorTypes,OptNames);
+    %                                         SimpleCode              = sprintf('Obs%s_VD%03dcm_I%i_T%02d_F%04d', Obs{ObsLoop}, VD(VDLoop)*100, Inter(InterLoop), Trial(TrialLoop), FrameLoop);
+    %                                         [Summary, FrameCounter] = MakeGUINZSummary(Summary, Result, SimpleCode, DorENum, FrameCounter);
+    %                                     end
+    %                                 end %of the if missing image part
+    %                             end
+    %                         end
+    %                     end
+    %                 end
+    %             end %end of if missing data
+    %         end
+    %     end
     [nrows,ncols] = size(Summary);
     for row = 1:nrows
         fprintf(fileID,formatSpec,Summary{row,:});

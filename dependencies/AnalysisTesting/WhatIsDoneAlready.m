@@ -1,5 +1,9 @@
-function [SumD SumDUnique] = WhatIsDoneAlready(Strategy, StrategyList)
-%Find files in approriate folder and list them in order
+function [SumD, SumDUnique] = WhatIsDoneAlready(Strategy, StrategyList, DorENum)
+%Find files in approriate folder and list completed files in order
+%LISATODO: deal with DorENum - so we get a list of only those which were
+%looking at the specified paratmeter
+
+%% Needs to be tested!
 
 AnalysisFileRoot            = GetPathSpecificToUser('Desktop','dssr2017-lhamm','AnalysisData', sprintf('%s',StrategyList{Strategy}));
 AnalysisFiles               = dir(sprintf('%sDataAnalysis*.dat',AnalysisFileRoot));
