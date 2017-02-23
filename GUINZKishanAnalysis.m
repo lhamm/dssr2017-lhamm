@@ -44,7 +44,7 @@ MaxFrames                   = GetMaxFrames(FileRoot, Obs, '.jpg');
 
 OptNames                    = {'Flower', 'Car', 'Butterfly','Rocket','Duck','Heart','House','Moon','Tree','Rabbit'};
 InterSeq                    = horzcat(ones(1,16), repmat(2,1,16), repmat(3,1,16), repmat(4,1,16));
-TrialSeq                    = repmat([1:16],1,4);
+TrialSeq                    = repmat(1:16,1,4);
 MissingDataFiles            = ''; 
 MissingImageFiles           = '';
 Done                        = 0;
@@ -69,7 +69,8 @@ if ~Done
     %% set up log file for test run
     FileName            = sprintf('DataAnalysis_%i_%i_AVer%0.1f_TVer%0.1f_Date_%s_RA_%s.dat', Strategy, DorENum, AnalysisVersion, TestingVersion, MyDate, RA);
     FileNameLog         = sprintf('DataAnalysis_%i_%i_AVer%0.1f_TVer%0.1f_Date_%s_RA_%s.txt', Strategy, DorENum, AnalysisVersion, TestingVersion, MyDate, RA);
-    % LISATODO: currently displays in the location you ran it from - try to move t
+    % LISATODO: currently displays in the location you ran it from - try to
+    % move but might be ok to leave - easy to move if correct.
     
     %try
     %% start loop
