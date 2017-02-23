@@ -1,0 +1,31 @@
+Version 1.2 and 1.3 data
+This randomly selected observer, inter, trial, and then did both 0.4m and 1.5m if they existed. 
+Categorisation was based on:
+PossErrorTypes = {'Perfect, looks sensible', 'BullsEye out of frame', 'Child obscuring bullsEye', 'BullsEye, but no rect', 'Wrong Position', 'Position Correct, no width', 'Width est, but wrong position'};
+
+Notes:
+1) was in 'detecting mode almost always - looked at original code, and it seems that a - 1 means BullsEye found, so 1 = tracking, but also, there may be an error in the original code on line 130 in DrawStim file, where it changes to detect if isempty(BEFound), however, it might be a 0 or NaN rather than empty....this might a major issue - easy to fix!
+
+2) earlier versions had slightly different options - these are an improvement - may want to break down 'wrong rect' further 
+
+To see results in this folder, can use:
+
+independentvar = 'Possible Errors'
+dependentvar   =  'Proportion'
+
+for i=1:length(AnalysisFiles)
+    try
+        a=importdata(AnalysisFiles(i).name);
+        for j=1:length(a.data);
+            b=char(a.textdata(j)) ;
+            cnt=cnt+1;
+            SumD(cnt,1)=str2double(b(4:10)); SumD(cnt,2) =str2double(b(14:16)); SumD(cnt,3) = str2double(b(21)); SumD(cnt,4) = str2double(b(24:25)); SumD(cnt,5)=a.data(j);
+        end
+    catch
+    end
+end
+
+    AllResults          = [sum(SumD(:,5)==1), sum(SumD(:,5)==2), sum(SumD(:,5)==3), sum(SumD(:,5)==4), sum(SumD(:,5)==5), sum(SumD(:,5)==6), sum(SumD(:,5)==7)];
+    TotalFramesOverTime = sum(AllResults);
+    Proportion          = AllResults/TotalFramesOverTime;
+    labelledBar(PossErrorTypes, Proportion, independentvar, dependentvar)

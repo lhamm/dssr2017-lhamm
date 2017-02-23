@@ -1,0 +1,2 @@
+MissingDataFiles: C:\Users\lham040\Documents\GUINZData\DataFiles\10223.4VD1.5_*.matC:\Users\lham040\Documents\GUINZData\DataFiles\10382.2VD1.5_*.mat 
+MissingImageFiles: 
