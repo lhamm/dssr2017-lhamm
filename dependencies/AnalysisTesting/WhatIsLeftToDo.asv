@@ -1,11 +1,13 @@
 function NewCombinationList          = WhatIsLeftToDo(AllCombinations,SumDUnique)
 %% all combinations is a n by 4 matrix, SumDUnique is at least 4 wide
-% if done, it returns an empty matrix
+% testing 
+% check what is left to do
 Input=nargin
 Arg1=length(AllCombinations)
 Arg2=length(SumDUnique)
 if Arg1>Arg2
-    error('Argument 2 needs to be longer than argument 1')
+    
+    
 end
 
 %% needs to be tested!
