@@ -2,8 +2,8 @@ function NewCombinationList          = WhatIsLeftToDo(AllCombinations,SumDUnique
 %% all combinations is a n by 4 matrix, SumDUnique is at least 4 wide
 % if done, it returns an empty matrix
 Input=nargin
-Arg1=length(AllCombinations)
-Arg2=length(SumDUnique)
+Arg1=size(AllCombinations,2)
+Arg2=size(SumDUnique,2)
 if Arg1>Arg2
     error('Argument 2 needs to be longer than argument 1')
 end

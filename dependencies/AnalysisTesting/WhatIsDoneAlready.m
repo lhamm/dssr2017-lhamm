@@ -46,8 +46,8 @@ if ~isempty(MissingDataFiles)      %check that there is data in the folder
             MissData        = char(Data(j));
           %  if length(MissData)>20 %more than the titles
                 cnt=cnt+1;
-                MissDataName    = MissData(1,(end-18:end-12));
-                MissDataVD      = MissData(1,(end-9:end-7));
+                MissDataName    = strjoin(cellstr(MissData(1,(end-18:end-12))));
+                MissDataVD      = strjoin(cellstr(MissData(1,(end-9:end-7))));
                 SumD(cnt:cnt+63,1) = str2double(MissDataName);
                 SumD(cnt:cnt+63,2) = str2double(MissDataVD);
                 SumD(cnt:cnt+15,3) = 1;SumD(cnt+16:cnt+31,3)=2;SumD(cnt+32:cnt+47,3)=3;SumD(cnt+48:cnt+63,3)=4;
@@ -62,13 +62,13 @@ MissingImageFiles           = dir(sprintf('%sDataAnalysis_%i_%i*IMAGE.txt',Analy
 if ~isempty(MissingImageFiles)
     for i=1:length(MissingImageFiles)
         Image=importdata(MissingImageFiles(i).name);
-        if ~empty(Image)
+        if ~isempty(Image)
             for j=1:length(Image)
             MissImage       = char(Image(j));
             % if length(MissImage)>20
             cnt=cnt+1;
             MissImageName    = str2double(strjoin(cellstr(MissImage(1,(end-27:end-21)))));
-            MissImageVD      = str2double(strjoin(cellstr(MissImage(end-17:end-15))))/100;
+            MissImageVD      = str2double(strjoin(cellstr(MissImage(end-17:end-15))));
             MissImageInter   = str2double(MissImage(end-10));
             MissImageTrial   = str2double(strjoin(cellstr(MissImage(end-7:end-6))));
             SumD(cnt,1) = MissImageName;

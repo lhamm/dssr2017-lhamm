@@ -110,7 +110,7 @@ if ~Done
                         end
                     elseif Strategy==4 %only load if a it has estimated an eye, and it is a new detect
                         if ~isnan(DataFile.S_Data.EyeTested(SeqInd, FrameList(j))) %&& ~DataFile.S_Data.FrameBullsEyeDetectRecord(SeqInd, FrameLoop) %eye estimate there and new detect
-                            FullImageName       = strcat(FileRoot, ImageFolderName, ImageCode.name);
+                            FullImageName       = strcat(FileRoot, ImageFolderName, ImageCode(1).name);
                         else
                             FullImageName      = 'NA';
                         end
@@ -118,7 +118,7 @@ if ~Done
                     %% 
                     if ~strcmp(FullImageName, 'NA')
                         Im                      = imread(FullImageName);
-                        [Result]                = CompareDataToImGUINZ(DataFile, Im, ImageCode.name,Inter(i), Trial(i), SeqInd, FrameList(j), PossErrorTypes,OptNames);
+                        [Result]                = CompareDataToImGUINZ(DataFile, Im, ImageCode(1).name,Inter(i), Trial(i), SeqInd, FrameList(j), PossErrorTypes,OptNames);
                        % SimpleCode              = sprintf('Obs%s_VD%03dcm_I%i_T%02d_F%04d', Obs{i}, VD(i)*100, Inter(i), Trial(i), FrameList(j));
                         [Summary, FrameCounter] = MakeGUINZSummary(Summary,Result, SimpleCode, DorENum, FrameCounter);
                     end
@@ -127,12 +127,12 @@ if ~Done
         end
     end
     %%
-    if ~isempty(MissingImageFiles) 
+    if ~isempty(MissingImageFiles{1,1}) 
         fileIDlog          = fopen(FileNameILog,'w'); %initialise log file
         fprintf(fileIDlog, '%s\n%s\n%s', MissingImageFiles{1,:},  MissingImageFiles{2,:}, MissingImageFiles{3,:});
         fclose(fileIDlog);
     end
-    if ~isempty(MissingDataFiles)
+    if ~isempty(MissingDataFiles{1,1})
         fileIDlog          = fopen(FileNameDLog,'w'); %initialise log file
         fprintf(fileIDlog,'%s\n%s\n%s',MissingDataFiles{1,:}, MissingDataFiles{2,:}, MissingDataFiles{4,:});
         fclose(fileIDlog);
