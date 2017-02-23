@@ -1,4 +1,4 @@
-function labelledBar(xLabels, yValues, XLabels, YLabels, Title)
+function labelledBar(xLabels, yValues, XLabels, YLabels)
 % first argument is a list of strings describing types of errors, but
 % nothing about correct
 %second argument between zero and one which includes the correct proportion
@@ -18,7 +18,7 @@ figure('Units','normalized', 'Position',[0.01 0.3 0.99 0.5],'Name','Results','Co
     
 bar (yValues,'FaceColor',[0.69 0.19 0.4]); %Bar Graph Values in Red
 set(gca,'XTickLabel',xLabels);
-titlefeat           = title (Title);
+titlefeat           = title ([independentvar, ' vs. ' dependentvar]);
 xfeat               = xlabel (XLabels);
 yfeat               = ylabel (YLabels);
 
