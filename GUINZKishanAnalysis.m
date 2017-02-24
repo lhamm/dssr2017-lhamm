@@ -5,12 +5,13 @@ close all
 format long g
 rng('shuffle')
 
-%% initialise frequently changing variables
+%% initialise variables
+%ones we need to change
 AnalysisVersion     = 2.1; %2.1=eye analysis added in; 1.3 = change how eyes were stored and fixed tracking/detecting numbers
 TestingVersion      = 1.0; % update as we use new data files
 LookAtFiles         = 1; %if 1 will show a summary so far
 
-%% Ask user for input
+%Ask user for input
 ReasearchAssistants = {'KM', 'LH'};
 RANum               = centmenu('Who are you?', ReasearchAssistants);
 RA                  = ReasearchAssistants{RANum};
@@ -36,7 +37,7 @@ else
 end 
     
 
-%% initialise variables - could make a structure containing these fields
+% initialise variables - could make a structure containing these fields
 FileRoot                    = GetPathSpecificToUser('Documents','GUINZData');
 [Obs, VD, Eyes, Stim]       = GetDataTypeListsGUINZ(FileRoot);
 AllCombinations             = allcomb(str2double(Obs), VD*100, 1:4, 1:16);
@@ -45,8 +46,10 @@ MaxFrames                   = GetMaxFrames(FileRoot, Obs, '.jpg');
 OptNames                    = {'Flower', 'Car', 'Butterfly','Rocket','Duck','Heart','House','Moon','Tree','Rabbit'};
 InterSeq                    = horzcat(ones(1,16), repmat(2,1,16), repmat(3,1,16), repmat(4,1,16));
 TrialSeq                    = repmat(1:16,1,4);
-MissingDataFiles            = ''; 
-MissingImageFiles           = '';
+MissingDataFiles            = cell(10,1); 
+MissingImageFiles           = cell(10,1);
+MissDataCnt                 = 0;
+MissImageCnt                = 0;
 Done                        = 0;
 FrameCounter                = 0;
 Summary                     = cell(1,3);
@@ -68,7 +71,9 @@ end
 if ~Done
     %% set up log file for test run
     FileName            = sprintf('DataAnalysis_%i_%i_AVer%0.1f_TVer%0.1f_Date_%s_RA_%s.dat', Strategy, DorENum, AnalysisVersion, TestingVersion, MyDate, RA);
-    FileNameLog         = sprintf('DataAnalysis_%i_%i_AVer%0.1f_TVer%0.1f_Date_%s_RA_%s.txt', Strategy, DorENum, AnalysisVersion, TestingVersion, MyDate, RA);
+    FileNameILog         = sprintf('DataAnalysis_%i_%i_AVer%0.1f_TVer%0.1f_Date_%s_RA_%s_%s.txt', Strategy, DorENum, AnalysisVersion, TestingVersion, MyDate, RA, 'IMAGE');
+    FileNameDLog         = sprintf('DataAnalysis_%i_%i_AVer%0.1f_TVer%0.1f_Date_%s_RA_%s_%s.txt', Strategy, DorENum, AnalysisVersion, TestingVersion, MyDate, RA,'DATA');
+    
     % LISATODO: currently displays in the location you ran it from - try to
     % move but might be ok to leave - easy to move if correct.
     
@@ -79,7 +84,8 @@ if ~Done
         DataCode                                = sprintf('%sDataFiles%c%sVD%0.1f_*.mat ',FileRoot, filesep, Obs{i},VD(i));
         flist                                   = dir(DataCode);
         if isempty(flist)
-            MissingDataFiles                    = strcat(MissingDataFiles, DataCode);
+            MissDataCnt=MissDataCnt+1;
+            MissingDataFiles{MissDataCnt, :}    = DataCode;
         else
             DataFile                            = open(strcat(sprintf('%sDataFiles%c',FileRoot, filesep),(flist(1).name)));
             SeqTrialInd                         = find(TrialSeq==Trial(i));
@@ -87,9 +93,11 @@ if ~Done
             MaxFrameNumberPerTrial              = find(diff(~isnan(DataFile.S_Data.FrameTimingRecord(SeqInd,:)))==(-1)); %or sum(~isnan(DataFile.S_Data.FrameTimingRecord(InterLoop*TrialLoop,:)));
             FrameList                           = 6:6:MaxFrameNumberPerTrial;
             for j=1:length(FrameList) %can't do this because  we need a 1 by 1 counter from frames - do it like before instead.
+                SimpleCode                      = sprintf('Obs%s_VD%03dcm_I%i_T%02d_F%04d', Obs{i}, VD(i)*100, Inter(i), Trial(i), FrameList(j));
                 ImageCode                       = dir(strcat(FileRoot, ImageFolderName,sprintf('%s_%0.1f_%i_%i_%i_*.jpg', Obs{i}, VD(i), Inter(i), Trial(i)-1, FrameList(j))));
                 if isempty(ImageCode)
-                    MissingImageFiles           = strcat(MissingImageFiles, ImageCode);
+                    MissImageCnt=MissImageCnt+1;
+                    MissingImageFiles{MissImageCnt,:} = SimpleCode; 
                 else
                     %% LISATODO: make a function
                     if Strategy==1 || Strategy==2
@@ -102,7 +110,7 @@ if ~Done
                         end
                     elseif Strategy==4 %only load if a it has estimated an eye, and it is a new detect
                         if ~isnan(DataFile.S_Data.EyeTested(SeqInd, FrameList(j))) %&& ~DataFile.S_Data.FrameBullsEyeDetectRecord(SeqInd, FrameLoop) %eye estimate there and new detect
-                            FullImageName       = strcat(FileRoot, ImageFolderName, ImageCode.name);
+                            FullImageName       = strcat(FileRoot, ImageFolderName, ImageCode(1).name);
                         else
                             FullImageName      = 'NA';
                         end
@@ -110,8 +118,8 @@ if ~Done
                     %% 
                     if ~strcmp(FullImageName, 'NA')
                         Im                      = imread(FullImageName);
-                        [Result]                = CompareDataToImGUINZ(DataFile, Im, ImageCode.name,Inter(i), Trial(i), SeqInd, FrameList(j), PossErrorTypes,OptNames);
-                        SimpleCode              = sprintf('Obs%s_VD%03dcm_I%i_T%02d_F%04d', Obs{i}, VD(i)*100, Inter(i), Trial(i), FrameList(j));
+                        [Result]                = CompareDataToImGUINZ(DataFile, Im, ImageCode(1).name,Inter(i), Trial(i), SeqInd, FrameList(j), PossErrorTypes,OptNames);
+                       % SimpleCode              = sprintf('Obs%s_VD%03dcm_I%i_T%02d_F%04d', Obs{i}, VD(i)*100, Inter(i), Trial(i), FrameList(j));
                         [Summary, FrameCounter] = MakeGUINZSummary(Summary,Result, SimpleCode, DorENum, FrameCounter);
                     end
                 end
@@ -119,11 +127,17 @@ if ~Done
         end
     end
     %%
-    if ~isempty(MissingImageFiles) || ~isempty(MissingDataFiles)
-        fileIDlog          = fopen(FileNameLog,'w'); %initialise log file
-        fprintf(fileIDlog, 'MissingDataFiles: %s \nMissingImageFiles: %s', [MissingDataFiles,  MissingImageFiles]');
+    if ~isempty(MissingImageFiles{1,1}) 
+        fileIDlog          = fopen(FileNameILog,'w'); %initialise log file
+        fprintf(fileIDlog, '%s\n%s\n%s', MissingImageFiles{1,:},  MissingImageFiles{2,:}, MissingImageFiles{3,:});
         fclose(fileIDlog);
     end
+    if ~isempty(MissingDataFiles{1,1})
+        fileIDlog          = fopen(FileNameDLog,'w'); %initialise log file
+        fprintf(fileIDlog,'%s\n%s\n%s',MissingDataFiles{1,:}, MissingDataFiles{2,:}, MissingDataFiles{4,:});
+        fclose(fileIDlog);
+    end
+    
     if exist('Summary','var')
         fileID              = fopen(FileName,'w');
         formatSpec          = '%s %i %i \n';
