@@ -17,14 +17,15 @@ RANum               = centmenu('Who are you?', ReasearchAssistants);
 RA                  = ReasearchAssistants{RANum};
 
 DistanceOrEye       = {'BullsEye', 'WhichEye'};
-DorENum             = centmenu('What are tyou looking at?',DistanceOrEye); %1=BullsEye, 2=Eye
+DorENum             = centmenu('What are you looking at?',DistanceOrEye); %1=BullsEye, 2=Eye
 DorE                = DistanceOrEye{DorENum};
 
 StrategyList        = {'SpecificSample', 'RandGenSample', 'AllNewDetects','OnlyWhenEyeDetected'};
-Strategy            = centmenu('What strategy do you want to take?', StrategyList);
+Strategy            = centmenu('What strategy do tyou want to take?', StrategyList);
 if Strategy>1
     NumberOfTrials  = centmenu('How many trials do you want to code?', {'1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20'});
-else
+elseif Strategy>=4
+    
     NumberOfTrials  = 1;
 end
 
