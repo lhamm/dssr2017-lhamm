@@ -107,6 +107,7 @@ if ~Done
                             FullImageName      = strcat(FileRoot, ImageFolderName, ImageCode(1).name);
                         else
                             FullImageName      = 'NA';
+                            
                         end
                     elseif Strategy==4 %only load if a it has estimated an eye, and it is a new detect
                         if ~isnan(DataFile.S_Data.EyeTested(SeqInd, FrameList(j))) %&& ~DataFile.S_Data.FrameBullsEyeDetectRecord(SeqInd, FrameLoop) %eye estimate there and new detect

@@ -75,6 +75,7 @@ if ~isempty(MissingImageFiles)
             SumD(cnt,2) = MissImageVD;
             SumD(cnt,3) = MissImageInter;
             SumD(cnt,4) = MissImageTrial;
+            SumD(cnt,5:6) = NaN;
             end
         end
     end
