@@ -89,7 +89,7 @@ end
 
 %% now order, and only look at unique files
 
-SumD=sort(SumD);
+%SumD=sort(SumD);
 SumD(isnan(SumD)) = Inf; %unique can't deal with NaN, but can with Inf
 SumDUnique=unique(SumD, 'rows');
 % change both back to NaNs
