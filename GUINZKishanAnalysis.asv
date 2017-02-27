@@ -152,10 +152,10 @@ if ~Done
         end
     end
     %%
-    if Strategy<5
+    if ~Strategy==5
         if ~isempty(MissingImageFiles{1,1})
             fileIDlog          = fopen(FileNameILog,'w'); %initialise log file
-            fprintf(fileIDlog, '%s\n%s\n%s\n%s\n%s\n%s', MissingImageFiles{1,:},  MissingImageFiles{2,:}, MissingImageFiles{3,:}, MissingImageFiles{4,:},  MissingImageFiles{5,:}, MissingImageFiles{6,:});
+            fprintf(fileIDlog, '%s\n%s\n%s', MissingImageFiles{1,:},  MissingImageFiles{2,:}, MissingImageFiles{3,:});
             fclose(fileIDlog);
         end
         if ~isempty(MissingDataFiles{1,1})
@@ -172,7 +172,7 @@ if ~Done
             end
             fclose(fileID);
         end
-    elseif Strategy==5 
+    elseif Strategy==5 %LISATODO - see how to save this data 
         UniqueMissingDataFiles = unique(MissingDataFiles);
         save(FileNameStrat5, 'VAResults','UniqueMissingDataFiles')
     end
@@ -180,7 +180,7 @@ if ~Done
     
     %% Plot!
     if LookAtFiles
-        if Strategy<5 && ~isnan(SumD(1,1))
+        if Strategy>5 && ~isnan(SumD(1,1))
             XLabels                = sprintf('Outcome of "%s" analysis strategy ', StrategyList{Strategy});
             YLabels                = sprintf('Proportion of frames in each category (out of %i)', length(SumD));
             Title                  = sprintf('%s, Subset: %s',DistanceOrEye{DorENum}, StrategyList{Strategy});
