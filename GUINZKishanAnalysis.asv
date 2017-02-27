@@ -152,10 +152,10 @@ if ~Done
         end
     end
     %%
-    if ~Strategy==5
+    if Strategy<5
         if ~isempty(MissingImageFiles{1,1})
             fileIDlog          = fopen(FileNameILog,'w'); %initialise log file
-            fprintf(fileIDlog, '%s\n%s\n%s', MissingImageFiles{1,:},  MissingImageFiles{2,:}, MissingImageFiles{3,:});
+            fprintf(fileIDlog, '%s\n%s\n%s\n%s\n%s\n%s', MissingImageFiles{1,:},  MissingImageFiles{2,:}, MissingImageFiles{3,:}, MissingImageFiles{4,:},  MissingImageFiles{5,:}, MissingImageFiles{6,:});
             fclose(fileIDlog);
         end
         if ~isempty(MissingDataFiles{1,1})
@@ -172,7 +172,7 @@ if ~Done
             end
             fclose(fileID);
         end
-    elseif Strategy==5 %LISATODO - see how to save this data 
+    elseif Strategy==5 
         UniqueMissingDataFiles = unique(MissingDataFiles);
         save(FileNameStrat5, 'VAResults','UniqueMissingDataFiles')
     end
@@ -180,7 +180,7 @@ if ~Done
     
     %% Plot!
     if LookAtFiles
-        if Strategy>5 && ~isnan(SumD(1,1))
+        if Strategy<5 && ~isnan(SumD(1,1))
             XLabels                = sprintf('Outcome of "%s" analysis strategy ', StrategyList{Strategy});
             YLabels                = sprintf('Proportion of frames in each category (out of %i)', length(SumD));
             Title                  = sprintf('%s, Subset: %s',DistanceOrEye{DorENum}, StrategyList{Strategy});
@@ -198,12 +198,13 @@ if ~Done
         elseif Strategy==5
             % made a function for this
             NearInd             = find(VAResults(:,2,1)==40);
-            RERegNear           = VAResults(NearInd, 3, 1);
-            REVanNear           = VAResults(NearInd, 4, 1);
-            LERegNear           = VAResults(NearInd, 5, 1);
-            LEVanNear           = VAResults(NearInd, 6, 1);
+            RERegNear           = VAResults(NearInd, 3, 1); BadRERegNear= find(RERegNear>0.2);
+            REVanNear           = VAResults(NearInd, 4, 1); BadREVanNear= find(REVanNear>0.2);
+            LERegNear           = VAResults(NearInd, 5, 1); BadLERegNear= find(LERegNear>0.2);
+            LEVanNear           = VAResults(NearInd, 6, 1); BadLERegNear= find(LERegNear>0.2);
             NearCodes           = VAResults(NearInd, 1, 1);
             PluggedInNear       = VAResults(NearInd, 4, 3); %only for RE vanishing
+           
             
             [CorR_LENear, CorP_LENear, BA_LENear] = LisaBlandAltman(LERegNear, LEVanNear, 'LERegNear', 'LEVanNear', NearCodes, PluggedInNear);
             [CorR_RENear, CorP_RENear, BA_RENear] = LisaBlandAltman(RERegNear, REVanNear, 'RERegNear', 'REVanNear', NearCodes, PluggedInNear);

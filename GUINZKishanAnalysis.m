@@ -198,22 +198,23 @@ if ~Done
         elseif Strategy==5
             % made a function for this
             NearInd             = find(VAResults(:,2,1)==40);
-            RERegNear           = VAResults(NearInd, 3, 1);
-            REVanNear           = VAResults(NearInd, 4, 1);
-            LERegNear           = VAResults(NearInd, 5, 1);
-            LEVanNear           = VAResults(NearInd, 6, 1);
-            NearCodes           = VAResults(NearInd, 1, 1);
+            RERegNear           = VAResults(NearInd, 3, 1:2); BadRERegNear= find(RERegNear>0.2);
+            REVanNear           = VAResults(NearInd, 4, 1:2); BadREVanNear= find(REVanNear>0.2);
+            LERegNear           = VAResults(NearInd, 5, 1:2); BadLERegNear= find(LERegNear>0.2);
+            LEVanNear           = VAResults(NearInd, 6, 1:2); BadLEVanNear= find(LEVanNear>0.2);
+            NearCodes           = VAResults(NearInd, 1, 1:2); 
             PluggedInNear       = VAResults(NearInd, 4, 3); %only for RE vanishing
+           
             
             [CorR_LENear, CorP_LENear, BA_LENear] = LisaBlandAltman(LERegNear, LEVanNear, 'LERegNear', 'LEVanNear', NearCodes, PluggedInNear);
             [CorR_RENear, CorP_RENear, BA_RENear] = LisaBlandAltman(RERegNear, REVanNear, 'RERegNear', 'REVanNear', NearCodes, PluggedInNear);
             
             DistInd             = find(VAResults(:,2,1)==150);
-            RERegDist           = VAResults(DistInd, 3, 1);
-            REVanDist           = VAResults(DistInd, 4, 1);
-            LERegDist           = VAResults(DistInd, 5, 1);
-            LEVanDist           = VAResults(DistInd, 6, 1);
-            DistCodes           = VAResults(DistInd, 1, 1); 
+            RERegDist           = VAResults(DistInd, 3, 1:2);
+            REVanDist           = VAResults(DistInd, 4, 1:2);
+            LERegDist           = VAResults(DistInd, 5, 1:2);
+            LEVanDist           = VAResults(DistInd, 6, 1:2);
+            DistCodes           = VAResults(DistInd, 1, 1:2); 
             PluggedInDist       = VAResults(DistInd, 4, 3); %only for RE vanishing
             
             [CorR_LEDist, CorP_LEDist, BA_LEDist] = LisaBlandAltman(LERegDist, LEVanDist, 'LERegDist', 'LEVanDist', DistCodes, PluggedInDist);
