@@ -57,7 +57,7 @@ end
 if isempty(NewCombinationList) 
     Done=1;
 else
-    [Obs, VD, Inter, Trial]     = ChooseFramesToTest(NewCombinationList, Strategy, NumberOfTrials);
+    [Obs, VD, Inter, Trial] = ChooseFramesToTest(NewCombinationList, Strategy, NumberOfTrials);
 end
 
 %% Let's go through all the files - this is where we link data to images
@@ -66,7 +66,7 @@ if ~Done
         ImageFolderName                             = sprintf('%s%c',Obs{i},filesep);
         DataCode                                    = sprintf('%sDataFiles%c%sVD%0.1f_*.mat ',FileRoot, filesep, Obs{i},VD(i));
         flist                                       = dir(DataCode);
-        if isempty(flist) % Record missing data files
+        if isempty(flist)
             MissDataCnt                             = MissDataCnt+1;
             MissingDataFiles{MissDataCnt, 1}        = DataCode;
         else
@@ -83,9 +83,9 @@ if ~Done
                 for j=1:length(FrameList)
                     SimpleCode                      = sprintf('Obs%s_VD%03dcm_I%i_T%02d_F%04d', Obs{i}, VD(i)*100, Inter(i), Trial(i), FrameList(j));
                     ImageCode                       = dir(strcat(FileRoot, ImageFolderName,sprintf('%s_%0.1f_%i_%i_%i_*.jpg', Obs{i}, VD(i), Inter(i), Trial(i)-1, FrameList(j))));
-                    if isempty(ImageCode) % Record missing image files
-                        MissImageCnt                        = MissImageCnt+1;
-                        MissingImageFiles{MissImageCnt,:}   = SimpleCode;
+                    if isempty(ImageCode)
+                        MissImageCnt=MissImageCnt+1;
+                        MissingImageFiles{MissImageCnt,:} = SimpleCode;
                     else
                         FullImageName               = GetImageFileName(FileRoot, ImageFolderName, ImageCode(1).name, Strategy, DataFile, SeqInd, FrameList(j));
                         if ~strcmp(FullImageName, 'NA')
@@ -99,7 +99,6 @@ if ~Done
         end
     end
     %% Finished with gathering information, now let's save results
-    %LISATODO: missing data and image files are limited in number of lines, update this! 
     if Strategy<5
         if ~isempty(MissingImageFiles{1,1})
             fileIDlog          = fopen(FileNameILog,'w'); %initialise log file
@@ -108,6 +107,9 @@ if ~Done
         end
         if ~isempty(MissingDataFiles{1,1})
             fileIDlog          = fopen(FileNameDLog,'w'); %initialise log file
+%             for i=1:length(MissingDataFiles)
+%                % LISATODO: make it save the whole missing data file.... 
+%             end
             fprintf(fileIDlog,'%s\n%s\n%s',MissingDataFiles{1,:}, MissingDataFiles{2,:}, MissingDataFiles{4,:});
             fclose(fileIDlog);
         end
@@ -122,7 +124,7 @@ if ~Done
         end
     elseif Strategy==5 
         UniqueMissingDataFiles = unique(MissingDataFiles);
-        save(FileNameStrat5, 'VAResults','UniqueMissingDataFiles') % These are matlab files - not very future-proof
+        save(FileNameStrat5, 'VAResults','UniqueMissingDataFiles')
     end
     
     %% Now let's have a look at the results so far
@@ -143,6 +145,8 @@ if ~Done
             end
         elseif Strategy==5
             SumaryImages(VAResults);
+        else
+            fprintf('no data files yet\n')
         end
     end
 end %skip all if done
