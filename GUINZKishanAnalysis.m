@@ -133,7 +133,7 @@ if ~Done
                                 
                             end
                         elseif Strategy==4 %only load if a it has estimated an eye, and it is a new detect
-                            if ~isnan(DataFile.S_Data.EyeTested(SeqInd, FrameList(j))) %&& ~DataFile.S_Data.FrameBullsEyeDetectRecord(SeqInd, FrameLoop) %eye estimate there and new detect
+                            if ~isnan(DataFile.S_Data.EyeTested(SeqInd, FrameList(j))) %&& ~DataFile.S_Data.FrameBullsEyeDetectRecord(SeqInd, FrameList(j)) %eye estimate there and new detect
                                 FullImageName       = strcat(FileRoot, ImageFolderName, ImageCode(1).name);
                             else
                                 FullImageName      = 'NA';
@@ -197,29 +197,8 @@ if ~Done
             
         elseif Strategy==5
             % made a function for this
-            NearInd             = find(VAResults(:,2,1)==40);
-            RERegNear           = VAResults(NearInd, 3, 1:2); BadRERegNear= find(RERegNear>0.2);
-            REVanNear           = VAResults(NearInd, 4, 1:2); BadREVanNear= find(REVanNear>0.2);
-            LERegNear           = VAResults(NearInd, 5, 1:2); BadLERegNear= find(LERegNear>0.2);
-            LEVanNear           = VAResults(NearInd, 6, 1:2); BadLEVanNear= find(LEVanNear>0.2);
-            NearCodes           = VAResults(NearInd, 1, 1:2); 
-            PluggedInNear       = VAResults(NearInd, 4, 3); %only for RE vanishing
+            SumaryImages(VAResults);
            
-            
-            [CorR_LENear, CorP_LENear, BA_LENear] = LisaBlandAltman(LERegNear, LEVanNear, 'LERegNear', 'LEVanNear', NearCodes, PluggedInNear);
-            [CorR_RENear, CorP_RENear, BA_RENear] = LisaBlandAltman(RERegNear, REVanNear, 'RERegNear', 'REVanNear', NearCodes, PluggedInNear);
-            
-            DistInd             = find(VAResults(:,2,1)==150);
-            RERegDist           = VAResults(DistInd, 3, 1:2);
-            REVanDist           = VAResults(DistInd, 4, 1:2);
-            LERegDist           = VAResults(DistInd, 5, 1:2);
-            LEVanDist           = VAResults(DistInd, 6, 1:2);
-            DistCodes           = VAResults(DistInd, 1, 1:2); 
-            PluggedInDist       = VAResults(DistInd, 4, 3); %only for RE vanishing
-            
-            [CorR_LEDist, CorP_LEDist, BA_LEDist] = LisaBlandAltman(LERegDist, LEVanDist, 'LERegDist', 'LEVanDist', DistCodes, PluggedInDist);
-            [CorR_REDist, CorP_REDist, BA_REDist] = LisaBlandAltman(RERegDist, REVanDist, 'RERegDist', 'REVanDist', DistCodes, PluggedInDist);
-            
         else
             fprintf('no data files yet\n')
             

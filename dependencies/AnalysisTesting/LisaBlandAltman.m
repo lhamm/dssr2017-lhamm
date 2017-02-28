@@ -12,8 +12,8 @@ Data1       = Data1(1:Ind,1);
 Data2       = Data2(1:Ind,1);
 Codes       = Codes(1:Ind,1);
 PluggedIn   = PluggedIn(1:Ind,1);
-Data1SD     = Data1(1:Ind,2); %maybe use the confidenc when plotting?
-Data2SD     = Data1(1:Ind,2);  %maybe use the confidenc when plotting?
+%Data1SD     = Data1(1:Ind,2); %maybe use the confidenc when plotting?
+%Data2SD     = Data1(1:Ind,2);  %maybe use the confidenc when plotting?
 
 Mean        = (Data1+Data2)/2;
 OverallMean = nanmean(Mean);
