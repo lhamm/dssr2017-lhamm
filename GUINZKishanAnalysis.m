@@ -142,7 +142,7 @@ if ~Done
                 fprintf('no data files yet\n')
             end
         elseif Strategy==5
-            SumaryImages(VAResults);
+            SummaryImages(VAResults);
         end
     end
 end %skip all if done
