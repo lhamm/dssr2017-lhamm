@@ -38,7 +38,7 @@ xlabel(Data1Text)
 ylabel(Data2Text)
 axis([MinXCor-0.1, MaxXCor+0.1, MinYCor-0.1, MaxYCor+0.1]);
 for i=1:length(VeryDifferent)
-   text(Data1(VeryDifferent(i)), Data2(VeryDifferent(i)), sprintf('%s PI=%i',num2str(Codes(i)),PluggedIn(i)))  
+   text(Data1(VeryDifferent(i)), Data2(VeryDifferent(i)), sprintf('%s PI=%i',num2str(Codes(VeryDifferent(i))),PluggedIn(VeryDifferent(i))))  
 end
 title(sprintf('Correlation R=%0.2f,p=%0.3f', CorR, CorP)) 
 hold off

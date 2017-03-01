@@ -26,7 +26,7 @@ StrategyList            = {'SpecificSample', 'RandGenSample', 'AllNewDetects','O
 Strategy                = centmenu('What strategy do you want to take?', StrategyList);
 % If we need it, ask which test we're doing, and how many trials do you want to code?
 if Strategy<5
-    NumberOfTrials          = GetNumberOfTrials(Strategy);
+    NumberOfTrials      = GetNumberOfTrials(Strategy);
     DistanceOrEye       = {'BullsEye', 'WhichEye'};
     DorENum             = centmenu('What are tyou looking at?',DistanceOrEye); %1=BullsEye, 2=Eye
     DorE                = DistanceOrEye{DorENum};   
