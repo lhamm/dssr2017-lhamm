@@ -28,26 +28,22 @@ try
 catch
     VeryDifferent = NaN;
 end
-figure('Position',[100 400 1200 500],'Color',[1 1 1]);
+figure('Position',[100 400 1000 500]);
 
 % formatting
-FontSize=14;
-FontSizeTitle=16;
+FontSize=12;
  
 subplot(1,2,1)
 scatter(Data1, Data2)
 hold on
 MinXCor=min(Data1); MaxXCor=max(Data1); MinYCor=min(Data2); MaxYCor=max(Data2);
-MinAx=min(MinXCor, MinYCor); MaxAx=max(MaxXCor,MaxYCor);
-
-xlabel(Data1Text, 'FontSize',FontSize)
-ylabel(Data2Text, 'FontSize',FontSize)
-axis([MinAx-0.1, MaxAx+0.1, MinAx-0.1, MaxAx+0.1]);
+xlabel(Data1Text)
+ylabel(Data2Text)
+axis([MinXCor-0.1, MaxXCor+0.1, MinYCor-0.1, MaxYCor+0.1]);
 for i=1:length(VeryDifferent)
-   text(Data1(VeryDifferent(i)), Data2(VeryDifferent(i)), sprintf('%s PI=%i',num2str(Codes(VeryDifferent(i))),PluggedIn(VeryDifferent(i))), 'FontSize',FontSize)  
+   text(Data1(VeryDifferent(i)), Data2(VeryDifferent(i)), sprintf('%s PI=%i',num2str(Codes(VeryDifferent(i))),PluggedIn(VeryDifferent(i))))  
 end
-title(sprintf('Correlation R=%0.2f,p=%0.3f', CorR, CorP), 'FontSize',FontSizeTitle)
-refline(1,0);
+title(sprintf('Correlation R=%0.2f,p=%0.3f', CorR, CorP)) 
 hold off
 lsline
 
@@ -55,8 +51,8 @@ subplot (1,2,2)
 hold on
 scatter(Mean, Diff)
 MinXBA=min(Mean); MaxXBA=max(Mean); MinYBA=min(Diff); MaxYBA=max(Diff);
-xlabel('Mean of measures', 'FontSize',FontSize)
-ylabel('Difference between measures ','FontSize',FontSize)
+xlabel('Mean of measures', 'FontSi)
+ylabel('Difference between measures ')
 axis([MinXBA-0.1, MaxXBA+0.1, MinYBA-0.1, MaxYBA+0.1]);
 x = [MinXBA-0.1, MinXBA-0.1, MaxXBA+0.1,MaxXBA+0.1];
 y = [UpperCI, LowerCI, LowerCI, UpperCI];
@@ -69,4 +65,3 @@ end
 lsline
 hold off
 BA=2*nanstd(Diff);
-title(sprintf('Confidence interval is %0.2f', BA), 'FontSize',FontSizeTitle)
