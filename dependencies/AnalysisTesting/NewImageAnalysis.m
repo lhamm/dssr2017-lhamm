@@ -1,4 +1,4 @@
-function [res1, res2, res3, res4, res5] = NewImageAnalysis(Im, VDcm, FOV)
+function [res1, res2, res3] = NewImageAnalysis(Im, VDcm, FOV)
 % use image to generate a new dataset containing results of new image
 % analysis
 
@@ -25,13 +25,11 @@ LB=floor(pi*(EstSmBullsEyeWidth/2).^2); %area of smaller (Pi r squared)    faceD
 [x0, y0, A] = get_bullseye_center_LH(Im, LB, UB, T1, T2);
 BEbbox=A;
 try
-    [BEFound, BullsEyeWidth, EstimatedVD, EyeTestedGuess]=SubPixelAnalysis(Im,BEbbox,SizeOfLargeTarget,PixelsPerDegreeOfIm, x0, y0);
+    [~, BullsEyeWidth, ~, EyeTestedGuess]=SubPixelAnalysis(Im,BEbbox,SizeOfLargeTarget,PixelsPerDegreeOfIm, x0, y0);
 catch
-    BEFound=0; BullsEyeWidth=NaN; EstimatedVD=[]; EyeTestedGuess=NaN;
+    BullsEyeWidth=NaN; EyeTestedGuess=NaN;
 end
 
 res1=BEbbox;
-res2=BEFound;
-res3=BullsEyeWidth;
-res4=EstimatedVD;
-res5=EyeTestedGuess;
+res2=BullsEyeWidth;
+res3=EyeTestedGuess;

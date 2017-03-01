@@ -74,8 +74,11 @@ DummyDorENum                 = ceil(2*rand(1,1));
 Im=imread('10004.3_0.4_1_1_6_091016_1212.jpg');
 VDcm=40;
 FOV=76;
-[BEbbox, BEFound, BullsEyeWidth, EstimatedVD, EyeTestedGuess]        = NewImageAnalysis(Im, VDcm, FOV);
+[BEbbox, BullsEyeWidth, EyeTestedGuess]        = NewImageAnalysis(Im, VDcm, FOV);
+Rect2=bbox2points(BEbbox);
 imshow(Im)
+rectangle('Position',[Rect2(1,1),Rect2(1,2), (max(Rect2(:,1))-min(Rect2(:,1))), (max(Rect2(:,2))-min(Rect2(:,2)))],'LineWidth',2, 'EdgeColor','g');
+text(double(min(Rect2(:,1))+5), double(min(Rect2(:,2))+10), sprintf('%0.1f\n\n\n%i',BullsEyeWidth, EyeTestedGuess),'Color','g') %data from newly aquire image analysis
+%% 
 
-% need to read image
-% need to read image
+

@@ -90,7 +90,7 @@ if ~Done
                         FullImageName               = GetImageFileName(FileRoot, ImageFolderName, ImageCode(1).name, Strategy, DataFile, SeqInd, FrameList(j));
                         if ~strcmp(FullImageName, 'NA')
                             Im                      = imread(FullImageName);
-                            [BEbbox, BEFound, BullsEyeWidth, EstimatedVD, EyeTestedGuess] = NewImageAnalysis(Im, VD(i)*100, FOV); 
+                            [BEbbox, BullsEyeWidth, EyeTestedGuess] = NewImageAnalysis(Im, VD(i)*100, FOV); 
                             Result                  = CompareDataToImGUINZ(DataFile, Im, ImageCode(1).name,Inter(i), Trial(i), SeqInd, FrameList(j), PossErrorTypes,OptNames, BEbbox, BullsEyeWidth, EyeTestedGuess, FOV);
                             [Summary, FrameCounter] = MakeGUINZSummary(Summary,Result, SimpleCode, DorENum, FrameCounter);
                         end
