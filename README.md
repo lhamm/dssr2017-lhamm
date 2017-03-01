@@ -1,6 +1,6 @@
 
 # dssr2017-lhamm
-## Image Analysis Linking Project: Moving towards more accurate childhood visual acuity measures in community settings
+## Image Analysis Project: Moving towards more accurate childhood visual acuity measures in community settings
 ### Background
 As a research group, we are interested how to get accuarate measures of visual function in children. Our interest in this is two-fold. If a child has something wrong with their eyes which can be treated, it is in their best interest to treat it as soon as possible. Early detection and treatment of an ocular anomoly allows the brain to develop an extraordinary capacity to make use of all the rich visual information available in our world. Even short durations of impairment early in life can have lasting impacts for how the visual world is interpreted. In addition to the benefits of vision screening, accurate measure of visual function in children also help the development of ocular treatments. For example, rest retest reliability of visual acuity tasks is quite low; if you ask a child to do an eye test twice, the difference between the two tests is likely to be within 0.3logMAR, or three lines on a standard eye chart. A new treatment, therefore, is often expected to show improvements which are beyond this range. A more accurate visual acuity test may help to understand which treatments are worth pursuing.  
 
@@ -13,7 +13,7 @@ This project is focused on the first aim; to assess the accuracy of the system u
 ### Requirements to run program
 This was developed for a specific purpose, uses confidential images from a pilot study, and matlab data stored in a particular structure format. As we move towards improving the tracking software, the target used, size of images, and format of the data which it is linked to are all likely to change, and therefore it is not be useful for externally generated data at this time. We will aim to include example data from the researchers so the program can be tested in it's current state. The second goal is the more universally useful one (to improved real time distance analysis software), which may be added as we get to that stage. 
 
-This project was built and tested on Matlab 2016a on a surface pro4. 
+This project was built and tested on Matlab 2016a on surface pro4s. 
 
 ### Contributions
 At this stage, the project is internal, questions and suggestions can be forwarded to l.hamm@auckland.ac.nz
