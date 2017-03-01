@@ -1,13 +1,21 @@
-function [SumD, SumDUnique] = WhatIsDoneAlready(Strategy, StrategyList, Position)
+function [SumD, SumDUnique] = WhatIsDoneAlready(Strategy, StrategyList, Position, Legitimacy)
 %Find files in approriate folder and list completed files in order
 % 5th position in SumD is for Bullseye, and 6th is for Eye
 
 %% Tests:
 % has been tested on empty folders, empty data files, and existing data, as we would expect most of the time
 % checked that it will work on random selections after Eye or Bullseye
-% in 
+% in
 
-AnalysisFileRoot            = GetPathSpecificToUser('Desktop','dssr2017-lhamm','AnalysisData', sprintf('%s',StrategyList{Strategy}));
+if Legitimacy == 1
+        AnalysisData = 'AnalysisData';
+else if Legitimacy == 2
+    AnalysisData = 'Dummy';
+    end
+end
+
+AnalysisFileRoot            = GetPathSpecificToUser('Desktop','dssr2017-lhamm',AnalysisData, sprintf('%s',StrategyList{Strategy}));
+
 %which tests are we doing?
 if Position==5
     Type=1; % bulls eye

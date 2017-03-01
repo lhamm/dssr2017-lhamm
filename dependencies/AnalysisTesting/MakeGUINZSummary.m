@@ -3,7 +3,7 @@ function [Summary, FrameCounter]=MakeGUINZSummary(Summary, Result, SimpleCode, D
 if DorENum==2
     EyeResult       = Result;
     BEResult        = NaN;
-else
+elseif DorENum==1
     EyeResult       = NaN;
     BEResult        = Result;
 end

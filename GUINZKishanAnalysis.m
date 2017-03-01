@@ -9,7 +9,7 @@ rng('shuffle')
 %ones we need to change
 AnalysisVersion     = 2.1; %2.1=eye analysis added in; 1.3 = change how eyes were stored and fixed tracking/detecting numbers
 TestingVersion      = 1.0; % update as we use new data files
-LookAtFiles         = 1; %if 1 will show a summary so far
+LookAtFiles         = 1; %if 1 will show a summary so far;'[
 
 %Ask user for input
 ReasearchAssistants = {'KM', 'LH'};
@@ -17,7 +17,7 @@ RANum               = centmenu('Who are you?', ReasearchAssistants);
 RA                  = ReasearchAssistants{RANum};
 
 DistanceOrEye       = {'BullsEye', 'WhichEye'};
-DorENum             = centmenu('What are tyou looking at?',DistanceOrEye); %1=BullsEye, 2=Eye
+DorENum             = centmenu('What are you looking at?',DistanceOrEye); %1=BullsEye, 2=Eye
 DorE                = DistanceOrEye{DorENum};
 
 StrategyList        = {'SpecificSample', 'RandGenSample', 'AllNewDetects','OnlyWhenEyeDetected'};
@@ -33,7 +33,7 @@ NumberOfTrials =150;
 if DorENum==1;
     PossErrorTypes  = {'Perfect, looks sensible', 'BullsEye out of frame', 'Child obscuring bullsEye', 'BullsEye, but no rect', 'Wrong Position', 'Position OK, no width', 'Width est, wrong position'};
     Position=5;
-else
+elseif DorENum==2;
     PossErrorTypes  = {'Perfect, CorPatch, CorID', 'BullsEye out of frame','Child obscuring bullsEye', 'CorPatch, WrongID', 'WrongPatch, CorID','WrongPatch, WrongID','No Eye RectWrong', 'No Eye RectCorrect','Eye est, wrong position'};
     Position=6;
 end 
@@ -55,9 +55,10 @@ MissImageCnt                = 0;
 Done                        = 0;
 FrameCounter                = 0;
 Summary                     = cell(1,3);
+Legitimacy                  = 2;
 
 %% Look at existing files and choose new ones
-[SumD, SumDUnique]          = WhatIsDoneAlready(Strategy, StrategyList, Position);
+[SumD, SumDUnique]          = WhatIsDoneAlready(Strategy, StrategyList, Position, Legitimacy);
 if isnan(SumD(1,1))
     NewCombinationList      = AllCombinations; %nothing yet, start with all options
 else
