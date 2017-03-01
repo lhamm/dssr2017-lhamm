@@ -1,0 +1,73 @@
+%% test data intialize
+format long g
+
+%% GetPathSpecificToUser
+%check to see if function is able to find require folder
+%seems as if titles are case insensitive as "Dssr2017-lhamm" is incorrectly
+%named with a capital at the start
+
+DestinationAfterUser1 = 'Desktop';
+DestinationAfterUser2 = 'Dssr2017-lhamm';
+DestinationAfterUser3 = 'Dummy';
+DestinationAfterUser4 = 'Should not exist';
+
+FileRoot = GetPathSpecificToUser(DestinationAfterUser1, DestinationAfterUser2, DestinationAfterUser3);
+res = FileRoot;
+
+%% GetDataTypeListsGUINZ
+%under Dummy folder, there are 10 folders however only 9 of them are
+%correctly named so only 9 folders should be identified
+
+Location = FileRoot; %for the sake of running the program without crashing
+
+res1    = (FileRoot);
+res2    = [0.4 1.5]; %viewing distances used 
+res3    = {'RE','LE'}; % could define differently
+res4    = {'Reg','Van'}; %could define dif1ferently %come on Lisa you spelt differently correct above
+
+[Obs, VD, Eyes, Stim] = GetDataTypeListsGUINZ(Location);
+
+%% GetMaxFrames
+% 23 Frames PX 1-8 where There are 8 Int1, 6Int2, 5Int3 and 4Int4 and 4
+% 1.5WD all of Int1 all of same date and time acquired
+% Px9 has 24 Frames, Px10 (incorrect name) has 25 frames.  Thus max frames
+% should equal 24
+
+MaxFrames                   = GetMaxFrames(FileRoot, Obs, '.jpg');
+
+%% WhatIsLeftToDo
+% DummySumDUnique Opt1 should no longer be on NewCombinationList, Opt2 have WD written differently and should be on list
+% 040 and 40 classified as same so Opt3 not on list either
+
+DummyAllCombinations    = [10003.4, 40, 1, 1;10003.4, 40, 1, 2; 10003.4, 40, 1, 3];
+DummySumDUnique         = [10003.4, 40, 1, 1, NaN, 2; 10003.4, 0.4, 1, 2, NaN, 2;10003.4, 040, 1, 3, NaN, 1];
+
+NewCombinationList      = WhatIsLeftToDo(DummyAllCombinations,DummySumDUnique);
+
+%% WhatIsDoneAlready
+% Tested by using already
+Strategy            = 3; %new detects
+StrategyList        = {'SpecificSample', 'RandGenSample', 'AllNewDetects','OnlyWhenEyeDetected'};
+Position            = 5; %BullsEye
+
+[SumD, SumDUnique] = WhatIsDoneAlready(Strategy, StrategyList, Position, Dummy);
+
+%% ChooseFramesToTest = visible results so no test written
+%% centmenu = in built tests and PT will rip me to shreds if I test it
+%% CompareDataToImGUINZ = visible picture given so no test written
+%% MakeGUINZSummary
+% Result of test should have NaN in column 2 if DummyDorENum is 1, NaN in
+% column 2 if DummyDorENum is 2
+
+DummySummary                 = cell(1,3);
+DummyFrameCounter            = 0;
+
+DummySimpleCode              = 10001.4; %removed other details as irrelevant in test
+DummyResult                  = 10; % wanted to have some fun here
+DummyDorENum                 = ceil(2*rand(1,1));
+
+[DummySummary, DummyFrameCounter] = MakeGUINZSummary(DummySummary, DummyResult, DummySimpleCode, DummyDorENum, DummyFrameCounter);
+
+%% labelledBar = visible results in form of bar graph so no written test bothered
+
+

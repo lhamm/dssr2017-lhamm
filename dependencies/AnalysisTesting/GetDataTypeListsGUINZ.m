@@ -1,5 +1,5 @@
 function [res1 res2 res3 res4] = GetDataTypeListsGUINZ(Location)
-% gets lists of data types from informaiotn in data folders
+% gets lists of data types from information in data folders
 
 %get participant lists who have images
 cnt=0;
