@@ -78,7 +78,7 @@ FOV=76;
 Rect2=bbox2points(BEbbox);
 imshow(Im)
 rectangle('Position',[Rect2(1,1), Rect2(1,2), (max(Rect2(:,1))-min(Rect2(:,1))), (max(Rect2(:,2))-min(Rect2(:,2)))],'LineWidth',2, 'EdgeColor','g');
-text(600, 30, sprintf('%0.1f\n%i',BullsEyeWidth, EyeTestedGuess),'Color','g') %data from newly aquire image analysis
+text(600, 0, sprintf('%0.1f\n\n\n%i',BullsEyeWidth, EyeTestedGuess),'Color','g') %data from newly aquire image analysis
 %% 
 
 

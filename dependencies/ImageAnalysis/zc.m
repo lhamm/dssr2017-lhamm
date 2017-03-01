@@ -1,0 +1,1 @@
+function res=zc(im)[m n]=size(im);res1=zeros(m,n);res2=zeros(m,n);range1=1:m-1;range2=2:m;res1(range1,:)=((im(range1,:)>0)&(im(range2,:)<=0))|((im(range1,:)<=0)&(im(range2,:)>0));range3=1:n-1;range4=2:n;res2(:,range3)=((im(:,range3)>0)&(im(:,range4)<=0))|((im(:,range3)<=0)&(im(:,range4)>0));res=res1|res2;
