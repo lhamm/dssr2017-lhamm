@@ -24,5 +24,6 @@ cntVA                       = 0;
 Done                        = 0;
 FrameCounter                = 0;
 Summary                     = cell(1,3);
+FOV                         = 76; %check this!
 
   

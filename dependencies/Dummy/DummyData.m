@@ -70,4 +70,12 @@ DummyDorENum                 = ceil(2*rand(1,1));
 
 %% labelledBar = visible results in form of bar graph so no written test bothered
 
+%% NewImageAnalysis
+Im=imread('10004.3_0.4_1_1_6_091016_1212.jpg');
+VDcm=40;
+FOV=76;
+[BEbbox, BEFound, BullsEyeWidth, EstimatedVD, EyeTestedGuess]        = NewImageAnalysis(Im, VDcm, FOV);
+imshow(Im)
 
+% need to read image
+% need to read image

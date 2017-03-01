@@ -60,12 +60,12 @@ else
     Eye='ND';
 end
 % Eye from new analysis:
-if EyeTestedGuess==1
-    Eye2='RE';
-elseif EyeTestedGuess==0
-    Eye2='LE';
+if DataFile.S_Data.EyeTested(SeqInd, Frame)==1
+    Eye='RE';
+elseif DataFile.S_Data.EyeTested(SeqInd, Frame)==0
+    Eye='LE';
 else
-    Eye2='ND';
+    Eye='ND';
 end
 
 if (Inter<=2 && strcmp('RE',Eye)) || (Inter>2 && strcmp('LE',Eye));
@@ -74,8 +74,6 @@ else
     EyeColour='r'; FontSize=14;
 end
 text(double(min(Rect(:,1))+10), double(max(Rect(:,2))+10), sprintf('%s',Eye),'Color',EyeColour);
-text(double(min(Rect2(:,1))+10), double(max(Rect2(:,2))+10), sprintf('%s',Eye2),'Color','g');
-
 
 %detecting vs tracking
 if DataFile.S_Data.FrameBullsEyeDetectRecord(SeqInd, Frame)==0

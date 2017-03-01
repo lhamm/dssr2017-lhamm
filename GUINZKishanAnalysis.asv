@@ -43,7 +43,7 @@ InitialiseVariables % This is a script not a function, an alternative would be t
 
 %% Look at existing files and choose new ones to code based on input so far
 if Strategy<5 % less than 5 means we are not doing all the files, we want a subset
-    [SumD, SumDUnique]          = WhatIsDoneAlready(Strategy, StrategyList, Position,1);
+    [SumD, SumDUnique]          = WhatIsDoneAlready(Strategy, StrategyList, Position);
     if isnan(SumD(1,1))
         NewCombinationList      = AllCombinations; %nothing yet, start with all options
     else
@@ -90,8 +90,8 @@ if ~Done
                         FullImageName               = GetImageFileName(FileRoot, ImageFolderName, ImageCode(1).name, Strategy, DataFile, SeqInd, FrameList(j));
                         if ~strcmp(FullImageName, 'NA')
                             Im                      = imread(FullImageName);
-                            [BEbbox, BEFound, BullsEyeWidth, EstimatedVD, EyeTestedGuess] = NewImageAnalysis(Im, VD(i)*100, FOV); 
-                            Result                  = CompareDataToImGUINZ(DataFile, Im, ImageCode(1).name,Inter(i), Trial(i), SeqInd, FrameList(j), PossErrorTypes,OptNames, BEbbox, BullsEyeWidth, EyeTestedGuess, FOV);
+                            [DataFile]              = 
+                            [Result]                = CompareDataToImGUINZ(DataFile, Im, ImageCode(1).name,Inter(i), Trial(i), SeqInd, FrameList(j), PossErrorTypes,OptNames);
                             [Summary, FrameCounter] = MakeGUINZSummary(Summary,Result, SimpleCode, DorENum, FrameCounter);
                         end
                     end
