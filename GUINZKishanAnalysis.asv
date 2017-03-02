@@ -59,9 +59,9 @@ if isempty(NewCombinationList)
     Done=1;
 else
     [Obs, VD, Inter, Trial]     = ChooseFramesToTest(NewCombinationList, Strategy, NumberOfTrials);
-    ObsList=ones(1,64*2);
+    ObsList=ones(1,64);
     for i=1:length(unique((Obs)))-1
-        ObsList = horzcat(ObsList, i+ones(1,64*2));
+        ObsList = horzcat(ObsList, i+ones(1,64));
     end
 end
 
@@ -72,6 +72,7 @@ if ~Done
         ImageFolderName                             = sprintf('%s%c',Obs{i},filesep);
         DataCode                                    = sprintf('%sDataFiles%c%sVD%0.1f_*.mat ',FileRoot, filesep, Obs{i},VD(i));
         flist                                       = dir(DataCode);
+        NewImCnt                                    = 0;
         if isempty(flist) % Record missing data files
             MissDataCnt                             = MissDataCnt+1;
             MissingDataFiles{MissDataCnt, 1}        = DataCode;
@@ -82,6 +83,11 @@ if ~Done
                 VAResults(cntVA, 1:6,:)             = GetVAFromPal(DataFile, ScalingR, ScalingV);
             end
             if Strategy<5 || Strategy==6 % This is used when we want want user input on each image
+                if VD(i)*100==40
+                    Resolution=640; %check
+                elseif VD(i)*100==150
+                     Resolution=1920; %check
+                end
                 SeqTrialInd                         = find(TrialSeq==Trial(i));
                 SeqInd                              = SeqTrialInd(Inter(i));
                 MaxFrameNumberPerTrial(i)           = find(diff(~isnan(DataFile.S_Data.FrameTimingRecord(SeqInd,:)))==(-1)); %or sum(~isnan(DataFile.S_Data.FrameTimingRecord(InterLoop*TrialLoop,:)));
@@ -92,22 +98,29 @@ if ~Done
                     if isempty(ImageCode) % Record missing image files
                         MissImageCnt                        = MissImageCnt+1;
                         MissingImageFiles{MissImageCnt,:}   = SimpleCode;
-                        NewSucessfulWidth(1,j) = NaN; % we can't get data from this file
                     else
                         FullImageName               = GetImageFileName(FileRoot, ImageFolderName, ImageCode(1).name, Strategy, DataFile, SeqInd, FrameList(j));
                         if ~strcmp(FullImageName, 'NA')
+                            NewImCnt=NewImCnt+1;
                             Im                      = imread(FullImageName);
                             [BEbbox, BullsEyeWidth, EyeTestedGuess] = NewImageAnalysis(Im, VD(i)*100, FOV);
-                            NewSucessfulWidth(1,j) = BullsEyeWidth;
+                            NewSucessfulVD(1,NewImCnt) = calcWD(BullsEyeWidth, 3.4, Resolution,FOV);
                             if Strategy<5
                                 Result                  = CompareDataToImGUINZ(DataFile, Im, ImageCode(1).name,Inter(i), Trial(i), SeqInd, FrameList(j), PossErrorTypes,OptNames, BEbbox, BullsEyeWidth, EyeTestedGuess, FOV);
-                                [Summary, FrameCounter] = MakeGUINZSummary(Summary,Result, SimpleCode, DorENum, FrameCounter);  
+                                [Summary, FrameCounter] = MakeGUINZSummary(Summary,Result, SimpleCode, DorENum, FrameCounter);
                             end
                         end
                     end
                 end
-                    WidthSummary(ObsList(i), SeqInd)     = (sum(~isnan(DataFile.S_Data.FrameBullsEyeWidthRecord(SeqInd, 1:MaxFrameNumberPerTrial(i)))))/(sum(isnan(DataFile.S_Data.FrameBullsEyeWidthRecord(SeqInd, 1:MaxFrameNumberPerTrial(i)))+(sum(~isnan(DataFile.S_Data.FrameBullsEyeWidthRecord(SeqInd, 1:MaxFrameNumberPerTrial(i)))))); % proportion of frames on one trial, in which a bulls eye estimate was available
-                    NewWidthSummary(ObsList(i),SeqInd)   =  sum(~isnan(NewSucessfulWidth(1,:)))/(sum(isnan(NewSucessfulWidth(1,:)))+sum(~isnan(NewSucessfulWidth(1,:))));%proportion correct from new analysis (1/6th of the data goes into the proportion)
+                WidthSummary(ObsList(i), TrialCnt(i),1)     = (sum(~isnan(DataFile.S_Data.FrameBullsEyeWidthRecord(SeqInd, 1:MaxFrameNumberPerTrial(i)))))/(sum(isnan(DataFile.S_Data.FrameBullsEyeWidthRecord(SeqInd, 1:MaxFrameNumberPerTrial(i)))+(sum(~isnan(DataFile.S_Data.FrameBullsEyeWidthRecord(SeqInd, 1:MaxFrameNumberPerTrial(i))))))); % proportion of frames on one trial, in which a bulls eye estimate was available
+                if ~isnan(WidthSummary(ObsList(i), TrialCnt(i),1))
+                    WidthSummary(ObsList(i), TrialCnt(i),2)     = min(DataFile.S_Data.FrameEstimatedDistanceRecord(SeqInd, 1:MaxFrameNumberPerTrial(i)));
+                end
+                NewWidthSummary(ObsList(i),TrialCnt(i),2)   =  sum(~isnan(NewSucessfulVD(1,:)))/(sum(isnan(NewSucessfulVD(1,:)))+sum(~isnan(NewSucessfulVD(1,:))));%proportion correct from new analysis (1/6th of the data goes into the proportion)
+                if ~isnan(NewWidthSummary(ObsList(i),TrialCnt(i),2))
+                    NewWidthSummary(ObsList(i),TrialCnt(i),2)   =  min(NewSucessfulVD(1,:));%proportion correct from new analysis (1/6th of the data goes into the proportion)
+                end
+                
             end
         end
     end
@@ -159,6 +172,8 @@ if ~Done
             end
         elseif Strategy==5
             SummaryImages(VAResults);
+        elseif Strategy==6
+            DistanceImages(NewWidthSummary, WidthSummary);
         end
     end
 end %skip all if done

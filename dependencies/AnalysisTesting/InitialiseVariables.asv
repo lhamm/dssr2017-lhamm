@@ -32,6 +32,6 @@ FOV                         = 76; %check this!
 
 WidthSummary                = NaN(length(unique(Obs))*2, 64, 2);
 NewWidthSummary             = NaN(length(unique(Obs))*2, 64, 2);
-TrialCnt                    = repmat([1:64], [1, length(unique(Obs))*2]); 
+TrialCnt                    = repmat(1 
 
   
