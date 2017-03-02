@@ -22,14 +22,29 @@ UB=ceil(pi*(EstLgBullsEyeWidth/2).^2)-(pi*(EstLgBullsEyeWidth/3).^2); %ara of la
 LB=floor(pi*(EstSmBullsEyeWidth/2).^2); %area of smaller (Pi r squared)    faceDetector   = vision.CascadeObjectDetector();
 
 %run the image analysis
-[x0, y0, A] = get_bullseye_center_LH(Im, LB, UB, T1, T2);
-BEbbox=A;
+try
+    [x0, y0, A] = get_bullseye_center_LH(Im, LB, UB, T1, T2);
+    BEbbox=A;
+catch
+end
 try
     [~, BullsEyeWidth, ~, EyeTestedGuess]=SubPixelAnalysis(Im,BEbbox,SizeOfLargeTarget,PixelsPerDegreeOfIm, x0, y0);
 catch
     BullsEyeWidth=NaN; EyeTestedGuess=NaN;
 end
+if exist('BEbbox','var')
+    res1=BEbbox;
+else
+    res1=NaN;
+end
 
-res1=BEbbox;
-res2=BullsEyeWidth;
-res3=EyeTestedGuess;
+if exist('BullsEyeWidth','var')
+    res2=BullsEyeWidth;
+else
+    res2=NaN;
+end
+if exist('EyeTestedGuess','var')
+    res3=EyeTestedGuess;
+else
+    res3 = NaN;
+end

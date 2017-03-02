@@ -1,2 +1,0 @@
-% shut down function
-

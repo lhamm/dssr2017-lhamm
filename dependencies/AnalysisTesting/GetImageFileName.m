@@ -15,6 +15,10 @@ elseif Strategy==4 %only load if a it has estimated an eye, and it is a new dete
     else
         FullImageName      = 'NA';
     end
+elseif Strategy==6
+    FullImageName       = strcat(FileRoot, ImageFolderName, ImageCode);
+else
+    FullImageName           = 'NA';
 end
 
 res = FullImageName;
