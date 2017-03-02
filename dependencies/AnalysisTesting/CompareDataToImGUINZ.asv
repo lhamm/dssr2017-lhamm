@@ -22,27 +22,7 @@ elseif DataFile.S_Admin.ViewingDistanceInM==1.5;
 end
 Rect=cell2mat(DataFile.S_Data.PositionOfBullsEyeInFrame(SeqInd, Frame));
 
-%% get information from new analysis (no tracking - new detect every time)
-rectangle('Position',[Rect(1,1),Rect(1,2), (max(Rect(:,1))-min(Rect(:,1))), (max(Rect(:,2))-min(Rect(:,2)))],'LineWidth',2, 'EdgeColor',Red);
-text(double(min(Rect2(:,1))+5), double(min(Rect2(:,2))-10), sprintf('%0.1f',BullsEyeWidth),'Color', Green) %data from newly aquire image analysis
-%derived from new analysis
-EstimatedVD2=calcWD(BullsEyeWidth, 3.4, Resolution, FOV);
-text(double(min(Rect2(:,1))+5), double(min(Rect2(:,2))-30), sprintf('%0.1f',EstimatedVD2+2),'Color',Green) %plus 2 because of the gap between eye and glasses 
-% Eye from new analysis:
-if EyeTestedGuess==1
-    Eye2='RE';
-elseif EyeTestedGuess==0
-    Eye2='LE';
-else
-    Eye2='ND';
-end
-% Set up for saying correct or incorrect with eye
-if (Inter<=2 && strcmp('RE',Eye2)) || (Inter>2 && strcmp('LE',Eye2));
-    EyeColour=Green; FontSize=10;
-else
-    EyeColour=Red; FontSize=14;
-end
-text(double(min(Rect2(:,1))+10), double(max(Rect2(:,2))+10), sprintf('%s',Eye2),'Color',Green);
+
 
 %% get information from original data:
 rectangle('Position',[Rect2(1,1),Rect2(1,2), (max(Rect2(:,1))-min(Rect2(:,1))), (max(Rect2(:,2))-min(Rect2(:,2)))],'LineWidth',2, 'LineStyle',':','EdgeColor',Green);
@@ -66,7 +46,27 @@ else
 end
 text(double(min(Rect(:,1))+10), double(max(Rect(:,2))+10), sprintf('%s',Eye),'Color',EyeColour);
 
-
+%% get information from new analysis (no tracking - new detect every time)
+rectangle('Position',[Rect(1,1),Rect(1,2), (max(Rect(:,1))-min(Rect(:,1))), (max(Rect(:,2))-min(Rect(:,2)))],'LineWidth',2, 'EdgeColor',Red);
+text(double(min(Rect2(:,1))+5), double(min(Rect2(:,2))-10), sprintf('%0.1f',BullsEyeWidth),'Color', Green) %data from newly aquire image analysis
+%derived from new analysis
+EstimatedVD2=calcWD(BullsEyeWidth, 3.4, Resolution, FOV);
+text(double(min(Rect2(:,1))+5), double(min(Rect2(:,2))-30), sprintf('%0.1f',EstimatedVD2+2),'Color',Green) %plus 2 because of the gap between eye and glasses 
+% Eye from new analysis:
+if EyeTestedGuess==1
+    Eye2='RE';
+elseif EyeTestedGuess==0
+    Eye2='LE';
+else
+    Eye2='ND';
+end
+% Set up for saying correct or incorrect with eye
+if (Inter<=2 && strcmp('RE',Eye)) || (Inter>2 && strcmp('LE',Eye));
+    EyeColour=Green; FontSize=10;
+else
+    EyeColour=Red; FontSize=14;
+end
+text(double(min(Rect2(:,1))+10), double(max(Rect2(:,2))+10), sprintf('%s',Eye2),'Color',Green);
 %% What is the child seeing on the screen
 % Which optotype?
 Opt=DataFile.S_Data.OptotypeTypeDisplayed(Inter, Trial);
@@ -86,7 +86,7 @@ else
 end
 text(10,50, sprintf('%s',Resp),'Color',RespColour)
 
-% Was the program in detecting or tracking mode on this frame?
+% Detecting vs tracking
 if DataFile.S_Data.FrameBullsEyeDetectRecord(SeqInd, Frame)==0
     Type='Detecting';
 elseif DataFile.S_Data.FrameBullsEyeDetectRecord(SeqInd, Frame)==1
@@ -96,7 +96,6 @@ else
 end
 text(10,10, sprintf('%s',Type),'Color',Blue)
 
-%% Get the input from the user to see if it was correct!
 [InputBE]      = centmenu('Did it work?',PossErrorTypes);
 res1=InputBE;
 
