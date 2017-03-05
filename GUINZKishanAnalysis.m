@@ -173,7 +173,7 @@ if ~Done
         elseif Strategy==5
             SummaryImages(VAResults);
         elseif Strategy==6
-            DistanceImages(NewWidthSummary, WidthSummary);
+            DistanceImages(NewWidthSummary, WidthSummary, Obs, VD);
         end
     end
 end %skip all if done

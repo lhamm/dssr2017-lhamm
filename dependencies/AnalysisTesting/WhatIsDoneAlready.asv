@@ -47,7 +47,7 @@ if ~isempty(AnalysisFiles)      %check that there is data in the folder
             for j=1:length(a.data);
                 b=char(a.textdata(j)) ;
                 cnt=cnt+1;
-                SumD(cnt,1)=str2double(b(4:10)); SumD(cnt,2) =str2double(b(14:16)); SumD(cnt,3) = str2double(b(21)); SumD(cnt,4) = str2double(b(24:25)); SumD(cnt,Position)=a.data(j,Type); SumD(cnt,7)=str2double(b(end-3:end));
+                SumD(cnt,1)=str2double(b(4:10)); SumD(cnt,2) =str2double(b(14:16)); SumD(cnt,3) = str2double(b(21)); SumD(cnt,4) = str2double(b(24:25)); SumD(cnt,Position)=a.data(j,Type); SumD(cnt,7);
                 if Position==5
                     SumD(cnt,6)=NaN;
                 elseif Position==6
