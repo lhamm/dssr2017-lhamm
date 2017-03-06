@@ -17,7 +17,7 @@ BEboxPosition = bbox2points(BEbbox);
 Rect2=BEboxPosition;
 if DataFile.S_Admin.ViewingDistanceInM==0.4;
     Resolution=640;
-elseif DataFile.S_Admin.ViewingDistanceInM==1.5;
+elseif DataFile.S_Admin.ViewingDistanceInM==1.5; 
     Resolution=1920;
 end
 Rect=cell2mat(DataFile.S_Data.PositionOfBullsEyeInFrame(SeqInd, Frame));

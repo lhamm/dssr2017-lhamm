@@ -38,7 +38,7 @@ if Strategy<5
         Position=6;
     end
 else
-    Position=NaN;
+    Po
 end
 % Initialise all the counters, folders, etc - no changes should need to be make, just check for accuracy
 InitialiseVariables % This is a script not a function, an alternative would be to put all variables into a structure

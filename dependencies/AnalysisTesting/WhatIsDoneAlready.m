@@ -31,7 +31,7 @@ if Strategy<5 % only get files from the folders with the same strategies
 else %get files from all subfolders
     [~, list]                   = system('dir /B /S DataAnalysis*.dat'); %get all analysis files!
     result                      = textscan(list, '%s', 'delimiter','\n');
-    AnalysisFiles              = result{1};
+    AnalysisFiles               = result{1};
 end
 
 
@@ -41,13 +41,30 @@ if ~isempty(AnalysisFiles)      %check that there is data in the folder
         if Strategy<5
             a=importdata(AnalysisFiles(i).name);
         else
-            a = importdata(strjoin(AnalysisFiles(i)));
+            a=importdata(strjoin(AnalysisFiles(i)));
         end
         if ~isempty(a)          % check that there is data in the data file
             for j=1:length(a.data);
-                b=char(a.textdata(j)) ;
+               % if Strategy<5
+                  b=char(a.textdata(j)) ;
+                  if Strategy>=5
+                     c      = char(AnalysisFiles(1));
+                     Type   = c(end-43);  % should be the type which is being coded (BullsEye or Eye)
+                     if Type==1
+                         Position = 5; 
+                     else
+                         Position = 6;
+                     end
+                  end
+               % end
                 cnt=cnt+1;
+                try
                 SumD(cnt,1)=str2double(b(4:10)); SumD(cnt,2) =str2double(b(14:16)); SumD(cnt,3) = str2double(b(21)); SumD(cnt,4) = str2double(b(24:25)); SumD(cnt,Position)=a.data(j,Type); SumD(cnt,7)=str2double(b(end-3:end));
+                catch
+                 SumD(cnt,1)=str2double(b(4:10)); SumD(cnt,2) =str2double(b(14:16)); SumD(cnt,3) = str2double(b(21)); SumD(cnt,4) = str2double(b(24:25)); SumD(cnt,Position)=NaN; SumD(cnt,7)=str2double(b(end-3:end));
+                 
+                end
+                
                 if Position==5
                     SumD(cnt,6)=NaN;
                 elseif Position==6
