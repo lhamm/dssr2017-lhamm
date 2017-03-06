@@ -38,7 +38,7 @@ if Strategy<5
         Position=6;
     end
 else
-    Po
+    Position=NaN;
 end
 % Initialise all the counters, folders, etc - no changes should need to be make, just check for accuracy
 InitialiseVariables % This is a script not a function, an alternative would be to put all variables into a structure
@@ -108,8 +108,8 @@ if ~Done
                             [BEbbox, BullsEyeWidth, EyeTestedGuess] = NewImageAnalysis(Im, VD(i)*100, FOV);
                             NewSucessfulVD(1,NewImCnt) = calcWD(BullsEyeWidth, 3.4, Resolution,FOV);
                             if Strategy<5
-                                Result                  = CompareDataToImGUINZ(DataFile, Im, ImageCode(1).name,Inter(i), Trial(i), SeqInd, FrameList(j), PossErrorTypes,OptNames, BEbbox, BullsEyeWidth, EyeTestedGuess, FOV);
-                                [Summary, FrameCounter] = MakeGUINZSummary(Summary,Result, SimpleCode, DorENum, FrameCounter);
+                                [Result, CorrectPosition]   = CompareDataToImGUINZ(DataFile, Im, ImageCode(1).name,Inter(i), Trial(i), SeqInd, FrameList(j), PossErrorTypes,OptNames, BEbbox, BullsEyeWidth, EyeTestedGuess, FOV);
+                                [Summary, FrameCounter]     = MakeGUINZSummary(Summary,Result, SimpleCode, DorENum, FrameCounter);
                             end
                         end
                     end

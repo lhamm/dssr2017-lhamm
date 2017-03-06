@@ -3,8 +3,8 @@ function [res1 res2]   = CompareDataToImGUINZ(DataFile, Im, ImageCode, Inter, Tr
 % outputs - shows image and allows user input to that image
 
 %show image with rectangles from data and get user input to see if it is
-figure('Units','normalized','Position',[0 0.45, 0.5 0.35],'Name',sprintf('Obs:%s, VD:%0.1f, Inter:%i, Trial:%i, Frame:%i',DataFile.S_Admin.observerCode,DataFile.S_Admin.ViewingDistanceInM, Inter, Trial, Frame))
-imshow(Im, 'InitialMagnification', 160);
+figure('Units','normalized','Position',[0.2 0.5 0.2 0.3],'Name',sprintf('Obs:%s, VD:%0.1f, Inter:%i, Trial:%i, Frame:%i',DataFile.S_Admin.observerCode,DataFile.S_Admin.ViewingDistanceInM, Inter, Trial, Frame))
+imshow(Im);
 hold on
 
 % Chose colours to use:
@@ -103,12 +103,7 @@ res1=InputBE;
 %% Input correct bullseye
 if InputBE==1 % if we don't already know where it is 
     CorrectPosition = Rect; %use the original rectagle
-elseif InputBE==3 
-    CorrectPosition = 'OutOfFrame';
-elseif InputBE==2 %bullseye out of frame
-    CorrectPosition = 'Obscured';
 else
-    
     input = centmenu('Was is the green rect correct?', {'Yes','No'});
     if input==1
         CorrectPosition = Rect2;
@@ -121,12 +116,12 @@ else
             rectangle('Position', [min(x1), min(y1), (max(x1)-min(x1)), (max(y1)-min(y1))],'Curvature', [1,1], 'EdgeColor', Blue, 'LineWidth',2)
                 input3=centmenu('Does that look right?', {'Yes', 'No - let me try again'});
                 if input3==1
-                    CorrectPosition = round([x1, y1]);
+                    CorrectPosition = [x1,y1];
                 else
                     CorrectPosition = [NaN, NaN; NaN, NaN; NaN, NaN; NaN, NaN];
                 end
         elseif input2==1
-            CorrectPosition = round([x,y]);
+            CorrectPosition = [x,y];
         end
     end
 end

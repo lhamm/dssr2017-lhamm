@@ -81,7 +81,7 @@ rectangle('Position',[Rect2(1,1), Rect2(1,2), (max(Rect2(:,1))-min(Rect2(:,1))),
 text(600, 30, sprintf('%0.1f\n%i',BullsEyeWidth, EyeTestedGuess),'Color','g') %data from newly aquire image analysis
 
 [x,y] = ginput(4);
-rectangle('Position', [min(x), min(y), (max(x)-min(x)), (max(y)-min(y))],'Curvature', [1,1], 'EdgeColor', [0.2,0.8,0.2])
+rectangle('Position', min(x), min(y), (max(x)-min(x)), (max(y)-
 %% 
 
 
