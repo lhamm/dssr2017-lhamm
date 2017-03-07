@@ -37,7 +37,7 @@ Sim                         = 10;                                       % differ
 
 thr                         = 30;                                       % pixel difference needed for edge detection of eye 
 
-% run the image analysis - will need to remove the try catch to find cases it does not work
+% run the image analysis
 try
     [x0, y0, A]                 = get_bullseye_center_LH(Im, LB, UB, T1, T2);           % obtain center and bounding box
     PA                          = [A(1)-Pad, A(2)-Pad, A(3)+2*Pad, A(4)+2*Pad];  % add the padded area to do subpixel analysis
@@ -45,20 +45,17 @@ try
     x                           = x0-PA(1);                                     % find center of bullseye within 'SmallIm'
     y                           = y0-PA(2);                                     % find center of bullseye within 'SmallIm'
     [Outer, Inner]              = SubPixelAnalysis(SmallIm, x, y, Amp, Sim);            % B is [x,y,Width, Height] from subpixel analysis (Amp is 1 if 1StD from the mean of the image)
-    % present the results in terms of the original image
-    Outer1                      = [Outer(1)+PA(1), Outer(2)+PA(2), Outer(3), Outer(4)];
-    Inner1                      = [Inner(1)+PA(1), Inner(2)+PA(2), Inner(3), Inner(4)];
 catch
-    Outer1 = [NaN NaN NaN NaN];
-    Inner1 = [NaN NaN NaN NaN];
-    x0     = NaN;
-    y0     = NaN;
+    Outer = [NaN NaN NaN NaN];
+    Inner = [NaN NaN NaN NaN];
 end
 
-
+% present the results in terms of the original image
+Outer1                      = [Outer(1)+PA(1), Outer(2)+PA(2), Outer(3), Outer(4)];
+Inner1                      = [Inner(1)+PA(1), Inner(2)+PA(2), Inner(3), Inner(4)];
 
 % report largest width, Wording distance, and eye
-Larger                      = max(Outer1(3), Outer1(4));
+Larger                      = max(Outer(3), Outer(4));
 WorkingDistance             = calcWD(Larger, SizeOfLargeTarget, Resolution, FOV) + Gap;
 Eye                         = FindEyeFromBird(Im, Outer1, x0, y0, thr);
 

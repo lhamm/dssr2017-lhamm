@@ -74,14 +74,27 @@ DummyDorENum                 = ceil(2*rand(1,1));
 Im=imread('10004.3_0.4_1_1_6_091016_1212.jpg');
 VDcm=40;
 FOV=76;
-[BEbbox, BullsEyeWidth, EyeTestedGuess]        = NewImageAnalysis(Im, VDcm, FOV);
-Rect2=bbox2points(BEbbox);
-imshow(Im)
-rectangle('Position',[Rect2(1,1), Rect2(1,2), (max(Rect2(:,1))-min(Rect2(:,1))), (max(Rect2(:,2))-min(Rect2(:,2)))],'LineWidth',2, 'EdgeColor','g');
-text(600, 30, sprintf('%0.1f\n%i',BullsEyeWidth, EyeTestedGuess),'Color','g') %data from newly aquire image analysis
+[Outer1, Inner1, WorkingDistance, Eye]        = NewImageAnalysis(Im, VDcm, FOV);
 
-[x,y] = ginput(4);
-rectangle('Position', [min(x), min(y), (max(x)-min(x)), (max(y)-min(y))],'Curvature', [1,1], 'EdgeColor', [0.2,0.8,0.2])
-%% 
+imshow(Im)
+rectangle('Position',Outer1,'LineWidth',2.5, 'EdgeColor',[0 0.8 0.4], 'Curvature',[1 1]);
+rectangle('Position',Inner1,'LineWidth',2.5, 'EdgeColor',[0 0.8 0.4],'Curvature',[1,1]);
+text(650, 30, sprintf('WD=%0.1f\nEye=%i',WorkingDistance, Eye)) %data from newly aquire image analysis
+
+
+%%  Image with no bullseye 
+Im = imread('noBullsEye.jpg');
+VDcm=40;
+FOV=76;
+[Outer1, Inner1, WorkingDistance, Eye]        = NewImageAnalysis(Im, VDcm, FOV);
+
+imshow(Im)
+if sum(isnan(Outer1))==0
+rectangle('Position',Outer1,'LineWidth',2.5, 'EdgeColor',[0 0.8 0.4], 'Curvature',[1 1]);
+rectangle('Position',Inner1,'LineWidth',2.5, 'EdgeColor',[0 0.8 0.4],'Curvature',[1,1]);
+text(650, 30, sprintf('WD=%0.1f\nEye=%i',WorkingDistance, Eye)) %data from newly aquire image analysis
+end
+
+%%  Test smaller functions with no bullseye
 
 

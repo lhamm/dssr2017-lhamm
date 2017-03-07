@@ -16,7 +16,8 @@ LookAtFiles             = 1;    % if 1 will show a summary so far
 ScalingR                = 7.7;  % this is based on Tonga data - could change based on adult experience
 ScalingV                = 14;   % we can figure this out based on Tonga and adult experiment - update for VA analysis!
 CodeImagesAsYouGo       = 1;    % we want to actively code images - will switch off if looking at bulls eye capture rate (strategy 6)
-CorrectPosition         = cell(4500, 2000);
+CorrectPositionStore    = cell(4500, 2);
+ScoreErrors             = 0;    % do not score errors, prioritise finding correct location.
 %% Ask user for input
 % Who is the researcher?
 ReasearchAssistants     = {'KM', 'LH'};
@@ -94,7 +95,8 @@ if ~Done
                 SeqTrialInd                         = find(TrialSeq==Trial(i));
                 SeqInd                              = SeqTrialInd(Inter(i));
                 MaxFrameNumberPerTrial(i)           = find(diff(~isnan(DataFile.S_Data.FrameTimingRecord(SeqInd,:)))==(-1)); %or sum(~isnan(DataFile.S_Data.FrameTimingRecord(InterLoop*TrialLoop,:)));
-                FrameList                           = 6:6:MaxFrameNumberPerTrial;
+                Remainder                           = mod(MaxFrameNumberPerTrial/2,6);
+                FrameList                           = [6, MaxFrameNumberPerTrial/2-Remainder];
                 for j=1:length(FrameList)
                     SimpleCode                      = sprintf('Obs%s_VD%03dcm_I%i_T%02d_F%04d', Obs{i}, VD(i)*100, Inter(i), Trial(i), FrameList(j));
                     ImageCode                       = dir(strcat(FileRoot, ImageFolderName,sprintf('%s_%0.1f_%i_%i_%i_*.jpg', Obs{i}, VD(i), Inter(i), Trial(i)-1, FrameList(j))));
@@ -106,10 +108,10 @@ if ~Done
                         if ~strcmp(FullImageName, 'NA')
                             NewImCnt=NewImCnt+1;
                             Im                      = imread(FullImageName);
-                            [BEbbox, BullsEyeWidth, EyeTestedGuess] = NewImageAnalysis(Im, VD(i)*100, FOV);
-                            NewSucessfulVD(1,NewImCnt) = calcWD(BullsEyeWidth, 3.4, Resolution,FOV);
+                            [Outer1, Inner1, WorkingDistance, Eye]  = NewImageAnalysis(Im, VD(i)*100, FOV);
+                            NewSucessfulVD(1,NewImCnt) = calcWD(max([Outer1(3), Outer1(4)]), 3.4, Resolution,FOV);
                             if Strategy<5
-                                [Result, CorrectPosition]   = CompareDataToImGUINZ(DataFile, Im, ImageCode(1).name,Inter(i), Trial(i), SeqInd, FrameList(j), PossErrorTypes,OptNames, BEbbox, BullsEyeWidth, EyeTestedGuess, FOV);
+                                [Result, CorrectPosition]   = CompareDataToImGUINZ(DataFile, Im, Inter(i), Trial(i), SeqInd, FrameList(j), PossErrorTypes, ScoreErrors, OptNames, Outer1, Inner1, WorkingDistance, Eye, FOV);
                                 [Summary, FrameCounter]     = MakeGUINZSummary(Summary,Result, SimpleCode, DorENum, FrameCounter);
                             end
                         end
@@ -123,7 +125,7 @@ if ~Done
                 if ~isnan(NewWidthSummary(ObsList(i),TrialCnt(i),2))
                     NewWidthSummary(ObsList(i),TrialCnt(i),2)   =  min(NewSucessfulVD(1,:));%proportion correct from new analysis (1/6th of the data goes into the proportion)
                 end
-                CorrectPosition{i,j} = CorrectPosition;
+                CorrectPositionStore{i,j} = CorrectPosition;
                 
             end
         end

@@ -1,71 +1,52 @@
-function [res1 res2]   = CompareDataToImGUINZ(DataFile, Im, ImageCode, Inter, Trial, SeqInd, Frame, PossErrorTypes,OptNames, BEbbox, BullsEyeWidth, EyeTestedGuess, FOV)
+function [res1, res2]   = CompareDataToImGUINZ(DataFile, Im, Inter, Trial, SeqInd, Frame, PossErrorTypes,ScoreErrors, OptNames, Outer1,Inner1, WorkingDistance, Eye, FOV)
 % inputs: dataFile from GUINZ (specific)
 % outputs - shows image and allows user input to that image
 
-%show image with rectangles from data and get user input to see if it is
-figure('Units','normalized','Position',[0.2 0.5 0.2 0.3],'Name',sprintf('Obs:%s, VD:%0.1f, Inter:%i, Trial:%i, Frame:%i',DataFile.S_Admin.observerCode,DataFile.S_Admin.ViewingDistanceInM, Inter, Trial, Frame))
-imshow(Im);
+%% set up graphics
+figure('Units','normalized','Position',[0 0.45, 0.5 0.35],'Name',sprintf('Obs:%s, VD:%0.1f, Inter:%i, Trial:%i, Frame:%i',DataFile.S_Admin.observerCode,DataFile.S_Admin.ViewingDistanceInM, Inter, Trial, Frame))
+imshow(Im, 'InitialMagnification', 100);
 hold on
 
-% Chose colours to use:
-Red     = [0.8 0.2 0.5];
-Green   = [0.2, 0.8,0.5];
-Blue    = [0.0 0.4 0.8];
+Red                 = [0.8 0.2 0.5];
+Green               = [0.2, 0.8,0.5];
+Blue                = [0.0 0.4 0.8];
+SizeOfLargeTarget   = 3.4; %cm
 
-% Get bounding box into correct format for the new data
-BEboxPosition = bbox2points(BEbbox);
-Rect2=BEboxPosition;
 if DataFile.S_Admin.ViewingDistanceInM==0.4;
-    Resolution=640;
+    Resolution=640;  
 elseif DataFile.S_Admin.ViewingDistanceInM==1.5; 
     Resolution=1920;
 end
-Rect=cell2mat(DataFile.S_Data.PositionOfBullsEyeInFrame(SeqInd, Frame));
+PixelsPerDegreeOfIm = Resolution/FOV;
 
-%% get information from new analysis (no tracking - new detect every time)
-rectangle('Position',[Rect(1,1),Rect(1,2), (max(Rect(:,1))-min(Rect(:,1))), (max(Rect(:,2))-min(Rect(:,2)))],'LineWidth',2, 'EdgeColor',Red);
-text(double(min(Rect2(:,1))+5), double(min(Rect2(:,2))-10), sprintf('%0.1f',BullsEyeWidth),'Color', Green) %data from newly aquire image analysis
-%derived from new analysis
-EstimatedVD2=calcWD(BullsEyeWidth, 3.4, Resolution, FOV);
-text(double(min(Rect2(:,1))+5), double(min(Rect2(:,2))-30), sprintf('%0.1f',EstimatedVD2+2),'Color',Green) %plus 2 because of the gap between eye and glasses 
+%% get information from old analysis 
+box = cell2mat(DataFile.S_Data.PositionOfBullsEyeInFrame(SeqInd, Frame));
+Rect1 = double([box(1,1),box(1,2), (max(box(:,1))-min(box(:,1))), (max(box(:,2))-min(box(:,2)))]);
+rectangle('Position',Rect1,'LineWidth',2, 'EdgeColor',Red);
 % Eye from new analysis:
-if EyeTestedGuess==1
+if DataFile.S_Data.EyeTested(SeqInd, Frame)==1
+    Eye1='RE';
+elseif DataFile.S_Data.EyeTested(SeqInd, Frame)==0
+    Eye1='LE';
+else
+    Eye1='ND';
+end
+text(645,200, sprintf('Wpx=%0.1f\nWD=%0.1f\nEye=%s', DataFile.S_Data.FrameBullsEyeWidthRecord(SeqInd, Frame), DataFile.S_Data.FrameEstimatedDistanceRecord(SeqInd, Frame), Eye1),'Color', Red) %data from newly aquire image analysis
+
+%% get information from new data:
+if ~sum(isnan(Outer1)
+rectangle('Position',Outer1,'LineWidth',2, 'LineStyle',':','EdgeColor',Green, 'Curvature',[1,1]);
+rectangle('Position',Inner1,'LineWidth',2, 'LineStyle',':','EdgeColor',Green, 'Curvature',[1,1]);
+% eye
+if Eye==1
     Eye2='RE';
-elseif EyeTestedGuess==0
+elseif Eye==0
     Eye2='LE';
 else
     Eye2='ND';
 end
-% Set up for saying correct or incorrect with eye
-if (Inter<=2 && strcmp('RE',Eye2)) || (Inter>2 && strcmp('LE',Eye2));
-    EyeColour=Green; FontSize=10;
-else
-    EyeColour=Red; FontSize=14;
-end
-text(double(min(Rect2(:,1))+10), double(max(Rect2(:,2))+10), sprintf('%s',Eye2),'Color',Green);
 
-%% get information from original data:
-rectangle('Position',[Rect2(1,1),Rect2(1,2), (max(Rect2(:,1))-min(Rect2(:,1))), (max(Rect2(:,2))-min(Rect2(:,2)))],'LineWidth',2, 'LineStyle',':','EdgeColor',Green);
-text(double(min(Rect(:,1))+5), double(min(Rect(:,2))-10), sprintf('%0.1f',DataFile.S_Data.FrameBullsEyeWidthRecord(SeqInd, Frame)),'Color',Red) %rect from newly aquired image analysis 
-% Actual viewing distance estimation: derived from Width in original data (could also use estimatedVD from original data 
-EstimatedVD=calcWD(DataFile.S_Data.FrameBullsEyeWidthRecord(SeqInd, Frame), 3.4, Resolution, FOV);
-text(double(min(Rect(:,1))+5), double(min(Rect(:,2))-30), sprintf('%0.1f',EstimatedVD+2),'Color',Red) %plus 2 because of the gap between eye and glasses 
-% Eye from original data:
-if DataFile.S_Data.EyeTested(SeqInd, Frame)==1
-    Eye='RE';
-elseif DataFile.S_Data.EyeTested(SeqInd, Frame)==0
-    Eye='LE';
-else
-    Eye='ND';
-end
-% Set up for saying correct or incorrect with eye
-if (Inter<=2 && strcmp('RE',Eye)) || (Inter>2 && strcmp('LE',Eye));
-    EyeColour=Green; FontSize=10;
-else
-    EyeColour=Red; FontSize=14;
-end
-text(double(min(Rect(:,1))+10), double(max(Rect(:,2))+10), sprintf('%s',Eye),'Color',EyeColour);
-
+text(645,320, sprintf('Wpx=%0.1f\nWD=%0.1f\nEye=%s',max([Outer1(3), Outer1(4)]),WorkingDistance, Eye2),'Color', Green) %data from newly aquire image analysis
 
 %% What is the child seeing on the screen
 % Which optotype?
@@ -75,16 +56,12 @@ if Opt==0
 end
 % How big was it? (pixels)
 OptSize=DataFile.S_Data.SizeDisplayed(Inter, Trial);
-text(10,30, sprintf('%s, %iPix',OptNames{Opt}, OptSize),'Color',Blue)
 Response=DataFile.q(Inter).response(1,Trial);
 if Response
     Resp='Correct';
-    RespColour=Green;
 else
     Resp='Incorrect';
-    RespColour=Red;
 end
-text(10,50, sprintf('%s',Resp),'Color',RespColour)
 
 % Was the program in detecting or tracking mode on this frame?
 if DataFile.S_Data.FrameBullsEyeDetectRecord(SeqInd, Frame)==0
@@ -94,36 +71,44 @@ elseif DataFile.S_Data.FrameBullsEyeDetectRecord(SeqInd, Frame)==1
 else
     Type='Not sure';
 end
-text(10,10, sprintf('%s',Type),'Color',Blue)
+text(645,40, sprintf('%s, %iPix\n%s\n%s',OptNames{Opt}, OptSize, Resp, Type),'Color',Blue)
 
 %% Get the input from the user to see if it was correct!
-[InputBE]      = centmenu('Did it work?',PossErrorTypes);
-res1=InputBE;
-
-%% Input correct bullseye
-if InputBE==1 % if we don't already know where it is 
-    CorrectPosition = Rect; %use the original rectagle
-else
-    input = centmenu('Was is the green rect correct?', {'Yes','No'});
-    if input==1
-        CorrectPosition = Rect2;
-    else
-        [x,y] = ginput(4);
-        rectangle('Position', [min(x), min(y), (max(x)-min(x)), (max(y)-min(y))],'Curvature', [1,1], 'EdgeColor', Blue, 'LineWidth',2)
-        input2=centmenu('Does that look right?', {'Yes', 'No - let me try again'});
-        if input2==2
-            [x1,y1] = ginput(4);
-            rectangle('Position', [min(x1), min(y1), (max(x1)-min(x1)), (max(y1)-min(y1))],'Curvature', [1,1], 'EdgeColor', Blue, 'LineWidth',2)
-                input3=centmenu('Does that look right?', {'Yes', 'No - let me try again'});
-                if input3==1
-                    CorrectPosition = [x1,y1];
-                else
-                    CorrectPosition = [NaN, NaN; NaN, NaN; NaN, NaN; NaN, NaN];
-                end
-        elseif input2==1
-            CorrectPosition = [x,y];
+if ScoreErrors %want to get detailed information
+    [InputBE]      = centmenu('Did it work?',PossErrorTypes);
+    res1=InputBE;
+else %Just want to find bullseye location
+    res1=NaN;
+    UserInput = input('What was the solution (1=red correct, 2=green correct, 3=not in frame, 4=child covering, 5=lt''s there, let me show you!\n>');
+    if UserInput==1
+        CorrectPosition = Rect1;
+    elseif UserInput==2
+        CorrectPosition = Outer1;
+    elseif UserInput==3
+        CorrectPosition = 'NotInFrame';
+    elseif UserInput==4
+        CorrectPosition = 'Obscured';
+    elseif UserInput==5 %need to location the bullseye on the picture manually
+        [x,y] = ginput(1);
+        if Resolution==640 % 40 cm task
+            HalfWidth = 40; 
+        elseif Resolution==1920 % 150 cm task
+            HalfWidth = 30;
+        end
+        NewIm  =  Im(y-HalfWidth:y+HalfWidth, x-HalfWidth:x+HalfWidth); % think more about this
+        [Out, In] = NewImageAnalysis(NewIm, DataFile.S_Admin.ViewingDistanceInM*100, FOV);
+        rectangle('Position', [Out(1)+(x-HalfWidth), Out(2)+(y-HalfWidth), Out(3), Out(4)],'Curvature', [1,1], 'EdgeColor', Blue, 'LineWidth',2)
+        rectangle('Position', [In(1)+(x-HalfWidth), In(2)+(y-HalfWidth), In(3), In(4)],'Curvature', [1,1], 'EdgeColor', Blue, 'LineWidth',2)
+        % add text to show BullsEyeWidth, etc.
+        UserInput2 = input('Does that look rigth? (1=yes, 2=No)\n>');
+        if UserInput2==1
+            CorrectPosition = Out;
+        else
+            CorrectPosition = 'Did not work';
         end
     end
 end
 res2 = CorrectPosition;
+
+
 

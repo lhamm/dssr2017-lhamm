@@ -16,6 +16,8 @@ LookAtFiles             = 1;    % if 1 will show a summary so far
 ScalingR                = 7.7;  % this is based on Tonga data - could change based on adult experience
 ScalingV                = 14;   % we can figure this out based on Tonga and adult experiment - update for VA analysis!
 CodeImagesAsYouGo       = 1;    % we want to actively code images - will switch off if looking at bulls eye capture rate (strategy 6)
+CorrectPosition         = cell(4500, 2000);
+ScoreErrors             = 0;    % do not score errors, prioritise finding correct location.
 %% Ask user for input
 % Who is the researcher?
 ReasearchAssistants     = {'KM', 'LH'};
@@ -105,10 +107,10 @@ if ~Done
                         if ~strcmp(FullImageName, 'NA')
                             NewImCnt=NewImCnt+1;
                             Im                      = imread(FullImageName);
-                            [BEbbox, BullsEyeWidth, EyeTestedGuess] = NewImageAnalysis(Im, VD(i)*100, FOV);
+                            [Outer1, Inner1, WorkingDistance, Eye]  = NewImageAnalysis(Im, VD(i)*100, FOV);
                             NewSucessfulVD(1,NewImCnt) = calcWD(BullsEyeWidth, 3.4, Resolution,FOV);
                             if Strategy<5
-                                [Result, CorrectPosition]   = CompareDataToImGUINZ(DataFile, Im, ImageCode(1).name,Inter(i), Trial(i), SeqInd, FrameList(j), PossErrorTypes,OptNames, BEbbox, BullsEyeWidth, EyeTestedGuess, FOV);
+                                [Result, CorrectPosition]   = CompareDataToImGUINZ(DataFile, Im, ImageCode(1).name,Inter(i), Trial(i), SeqInd, FrameList(j), PossErrorTypes, ScoreErrors, OptNames, BEbbox, BullsEyeWidth, EyeTestedGuess, FOV);
                                 [Summary, FrameCounter]     = MakeGUINZSummary(Summary,Result, SimpleCode, DorENum, FrameCounter);
                             end
                         end
@@ -122,6 +124,7 @@ if ~Done
                 if ~isnan(NewWidthSummary(ObsList(i),TrialCnt(i),2))
                     NewWidthSummary(ObsList(i),TrialCnt(i),2)   =  min(NewSucessfulVD(1,:));%proportion correct from new analysis (1/6th of the data goes into the proportion)
                 end
+                CorrectPosition{i,j} = CorrectPosition;
                 
             end
         end

@@ -23,9 +23,9 @@ end
 if length(crossPtsW)==6 && RangeW > Amp*(std(double(All(Im)))) && (abs((crossPtsW(2)-crossPtsW(1))-(crossPtsW(6)-crossPtsW(5)))<Sim) %we have a bullseye
     Bw              = [crossPtsW(end)-crossPtsW(1) crossPtsW(4)-crossPtsW(3)];
     x1              = crossPtsW(1);
-    x2              = crossPtsW(3);
+    x2              = crossPts(3);
 else
-    Bw              = [NaN NaN];
+    Bw              = NaN;
     x1              = NaN;
     x2              = NaN;
 end
@@ -38,9 +38,9 @@ sliceHint           = interp1(1:hi, sliceH, interpH);  %% this is not working...
 crossPtsH           = interpH(zc(sliceHint));
 RangeH              = max(sliceH)-min(sliceH);
 
-if sliceH(round(y),1)<0 && length(crossPtsH)>6 % our center point is a dark bit - but we have too many cross points, limit our cross points based on mid point
-    crossPtsHinds    = horzcat(find(crossPtsH<y,3), find(crossPtsH>y,3));
-    crossPtsH        = crossPtsH(crossPtsHinds);
+if sliceH(1,round(y))<0 && length(crossPtsH)>6 % our center point is a dark bit - but we have too many cross points, limit our cross points based on mid point
+    crossPtsWinds    = horzcat(find(crossPtsH<x,3), find(crossPtsW>x, 3));
+    crossPtsW        = crossPtsW(crossPtsWinds);
 end
 
 if length(crossPtsH)==6 && RangeH > Amp*std(double(All(Im))) && (abs((crossPtsH(2)-crossPtsH(1))-(crossPtsH(6)-crossPtsH(5)))<Sim) %we have a bullseye
@@ -48,7 +48,7 @@ if length(crossPtsH)==6 && RangeH > Amp*std(double(All(Im))) && (abs((crossPtsH(
     y1              = crossPtsH(1); 
     y2              = crossPtsH(3); 
 else
-    Bh              = [NaN NaN];
+    Bh              = NaN;
     y1              = NaN;
     y2              = NaN;
 end
@@ -57,3 +57,25 @@ end
 Outer               = [x1, y1, Bw(1), Bh(1)]; % this should make an eplipse exactly around the larger bullseye, or each should be a NaN
 Inner               = [x2, y2, Bw(2), Bh(2)]; % this should make an eplipse exactly around the smaller bullseye, or each should be a NaN
 
+
+
+%% try to find birds - for LE RE distinction
+if BEFound==1 && ~isnan(BullsEyeWidth)
+    try % to get which eye (look for glasses in a box 6.5x the size of the bullseye
+        LookForBirdA      = [x0-(BullsEyeWidth*1.5) y0-(BullsEyeWidth*1.8) BullsEyeWidth*1.5 BullsEyeWidth];
+        LookForBirdB      = [x0 y0-(BullsEyeWidth*1.8) BullsEyeWidth*1.5 BullsEyeWidth];
+        BirdImA           = uint8(imcrop(videoFrameGray,LookForBirdA));
+        BirdImB           = uint8(imcrop(videoFrameGray,LookForBirdB));
+        BirdImEdgeA        = edge(BirdImA,'Sobel',0.15);
+        BirdImEdgeB        = edge(BirdImB,'Sobel',0.15);
+        if (length(find(BirdImEdgeA==1)) - length(find(BirdImEdgeB==1))) > 30
+            EyeTestedGuess=0; %0=LE
+        elseif (length(find(BirdImEdgeB==1))-length(find(BirdImEdgeA==1))) > 30
+            EyeTestedGuess=1; %1=RE
+        end  
+    catch
+      EyeTestedGuess=NaN;  
+    end
+else
+    EyeTestedGuess=NaN;
+end
