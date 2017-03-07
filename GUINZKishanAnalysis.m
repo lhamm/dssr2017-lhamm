@@ -10,13 +10,13 @@ rng('shuffle')
 
 %% Initialise Variables
 % Variables we may want to change
-AnalysisVersion         = 2.1;  % 2.1=eye analysis added in; 1.3 = change how eyes were stored and fixed tracking/detecting numbers
+AnalysisVersion         = 3.0;  % 2.1=eye analysis added in; 1.3 = change how eyes were stored and fixed tracking/detecting numbers
 TestingVersion          = 1.0;  % update as we use new data files
 LookAtFiles             = 1;    % if 1 will show a summary so far
 ScalingR                = 7.7;  % this is based on Tonga data - could change based on adult experience
 ScalingV                = 14;   % we can figure this out based on Tonga and adult experiment - update for VA analysis!
 CodeImagesAsYouGo       = 1;    % we want to actively code images - will switch off if looking at bulls eye capture rate (strategy 6)
-CorrectPositionStore    = cell(4500, 2);
+CorrectPositionStore    = cell(8000, 4);
 ScoreErrors             = 0;    % do not score errors, prioritise finding correct location.
 %% Ask user for input
 % Who is the researcher?
@@ -24,7 +24,7 @@ ReasearchAssistants     = {'KM', 'LH'};
 RANum                   = centmenu('Who are you?', ReasearchAssistants);
 RA                      = ReasearchAssistants{RANum};
 % What strategy do we want to use?
-StrategyList            = {'SpecificSample', 'RandGenSample', 'AllNewDetects','OnlyWhenEyeDetected','All Data - just look at VA results', 'All Data - just look at bulleye capture rates'};
+StrategyList            = {'SpecificSample', 'RandGenSample', 'AllNewDetects','OnlyWhenEyeDetected','All Data - just look at VA results', 'All Data - just look at bulleye capture rates', 'CodingCorrect'};
 Strategy                = centmenu('What strategy do you want to take?', StrategyList);
 % If we need it, ask which test we're doing, and how many trials do you want to code?
 if Strategy<5
@@ -42,6 +42,7 @@ if Strategy<5
 else
     Position=NaN;
 end
+    
 % Initialise all the counters, folders, etc - no changes should need to be make, just check for accuracy
 InitialiseVariables % This is a script not a function, an alternative would be to put all variables into a structure
 
@@ -95,8 +96,8 @@ if ~Done
                 SeqTrialInd                         = find(TrialSeq==Trial(i));
                 SeqInd                              = SeqTrialInd(Inter(i));
                 MaxFrameNumberPerTrial(i)           = find(diff(~isnan(DataFile.S_Data.FrameTimingRecord(SeqInd,:)))==(-1)); %or sum(~isnan(DataFile.S_Data.FrameTimingRecord(InterLoop*TrialLoop,:)));
-                Remainder                           = mod(MaxFrameNumberPerTrial/2,6);
-                FrameList                           = [6, MaxFrameNumberPerTrial/2-Remainder];
+                Remainder                           = mod(MaxFrameNumberPerTrial(i)/2,6);
+                FrameList                           = [6, MaxFrameNumberPerTrial(i)/2-Remainder];
                 for j=1:length(FrameList)
                     SimpleCode                      = sprintf('Obs%s_VD%03dcm_I%i_T%02d_F%04d', Obs{i}, VD(i)*100, Inter(i), Trial(i), FrameList(j));
                     ImageCode                       = dir(strcat(FileRoot, ImageFolderName,sprintf('%s_%0.1f_%i_%i_%i_*.jpg', Obs{i}, VD(i), Inter(i), Trial(i)-1, FrameList(j))));
@@ -116,6 +117,8 @@ if ~Done
                             end
                         end
                     end
+                    CorrectPositionStore{i,j} = CorrectPosition;
+                    CorrectPositionStore{i,4} = SimpleCode;
                 end
                 WidthSummary(ObsList(i), TrialCnt(i),1)     = (sum(~isnan(DataFile.S_Data.FrameBullsEyeWidthRecord(SeqInd, 1:MaxFrameNumberPerTrial(i)))))/(sum(isnan(DataFile.S_Data.FrameBullsEyeWidthRecord(SeqInd, 1:MaxFrameNumberPerTrial(i)))+(sum(~isnan(DataFile.S_Data.FrameBullsEyeWidthRecord(SeqInd, 1:MaxFrameNumberPerTrial(i))))))); % proportion of frames on one trial, in which a bulls eye estimate was available
                 if ~isnan(WidthSummary(ObsList(i), TrialCnt(i),1))
@@ -125,8 +128,8 @@ if ~Done
                 if ~isnan(NewWidthSummary(ObsList(i),TrialCnt(i),2))
                     NewWidthSummary(ObsList(i),TrialCnt(i),2)   =  min(NewSucessfulVD(1,:));%proportion correct from new analysis (1/6th of the data goes into the proportion)
                 end
-                CorrectPositionStore{i,j} = CorrectPosition;
                 
+
             end
         end
     end
