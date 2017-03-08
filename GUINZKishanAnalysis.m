@@ -113,7 +113,11 @@ if ~Done
                     end
                     SeqTrialInd                         = find(TrialSeq==Trial(i));
                     SeqInd                              = SeqTrialInd(Inter(i));
+                    if isnan(DataFile.S_Data.FrameTimingRecord(SeqInd,end))
                     MaxFrameNumberPerTrial(i)           = find(diff(~isnan(DataFile.S_Data.FrameTimingRecord(SeqInd,:)))==(-1)); %or sum(~isnan(DataFile.S_Data.FrameTimingRecord(InterLoop*TrialLoop,:)));
+                    else
+                     MaxFrameNumberPerTrial(i)          = length(DataFile.S_Data.FrameTimingRecord(SeqInd,:))  
+                    end
                     Remainder                           = mod(MaxFrameNumberPerTrial(i)/2,6);
                     FrameList                           = [6, MaxFrameNumberPerTrial(i)/2-Remainder];
                     for j=1:length(FrameList)
