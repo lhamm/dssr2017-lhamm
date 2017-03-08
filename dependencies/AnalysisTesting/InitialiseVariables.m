@@ -31,6 +31,7 @@ Done                        = 0;
 FrameCounter                = 0;
 Summary                     = cell(1,3);
 FOV                         = 76; %check this!
+GoBack                      = 0;
 
 WidthSummary                = NaN(length(unique(Obs))*2, 64, 2);
 NewWidthSummary             = NaN(length(unique(Obs))*2, 64, 2);

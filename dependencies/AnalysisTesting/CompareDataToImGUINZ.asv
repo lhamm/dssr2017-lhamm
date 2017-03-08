@@ -1,4 +1,4 @@
-function [res1, res2]   = CompareDataToImGUINZ(DataFile, Im, Inter, Trial, SeqInd, Frame, PossErrorTypes,ScoreErrors, OptNames, Outer1,Inner1, WorkingDistance, Eye, FOV)
+function [res1, res2, res3]   = CompareDataToImGUINZ(DataFile, Im, Inter, Trial, SeqInd, Frame, PossErrorTypes,ScoreErrors, OptNames, Outer1,Inner1, WorkingDistance, Eye, FOV)
 % inputs: dataFile from GUINZ (specific)
 % outputs - shows image and allows user input to that image
 
@@ -74,15 +74,18 @@ end
 text(645,40, sprintf('%s, %iPix\n%s\n%s',OptNames{Opt}, OptSize, Resp, Type),'Color',Blue)
 
 %% Get the input from the user to see if it was correct!
+res3 = 0; % Assume they don't want to go back - this will chanch if they opt for it!
 if ScoreErrors %want to get detailed information
     [InputBE]      = centmenu('Did it work?',PossErrorTypes);
     res1=InputBE;
 else %Just want to find bullseye location
-    res1=NaN; %why is this here?? likely can get rid of it!
+    res1 = NaN; % not coding type of error
     UserInput = centmenu('Where is the bullseye?', PossErrorTypes);
-    
     %UserInput = input('What was the solution (1=Red correct, 2=Green correct, 3=It''s there - let me show you!, 4=Out of frame, 5=Edge of frame, 6=Child Obscuring\n>');
-    if UserInput==1
+    if UserInput==7
+        res3 = 1;
+        CorrectPosition = [];
+    elseif UserInput==1
         CorrectPosition = Rect1;
     elseif UserInput==2
         CorrectPosition = Outer1;
@@ -108,7 +111,7 @@ else %Just want to find bullseye location
             end
         end
         
-        % add text to show BullsEyeWidth, etc.
+        % add text to show BullsEyeWidth, etc?
         UserInput2  = centmenu('Does the blue bullseye look accurate',{'yes','no'});
         %UserInput2 = input('Does that look rigth? (1=yes, 2=No)\n>');
         if UserInput2==1

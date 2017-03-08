@@ -34,7 +34,7 @@ if Strategy<5 || Strategy==7
     DorE                = DistanceOrEye{DorENum};
     if DorENum==1;
         if Strategy==7
-            PossErrorTypes  = {'Red Perfect', 'Green Perfect','It''s there, let me show you!','Out of frame', 'Edge of frame', 'Partially obscured'};
+            PossErrorTypes  = {'Red Perfect', 'Green Perfect','It''s there, let me show you!','Out of frame', 'Edge of frame', 'Partially obscured', 'Ooops, Can I go back please'};
         else
         PossErrorTypes  = {'Perfect, looks sensible', 'BullsEye out of frame', 'Child obscuring bullsEye', 'BullsEye, but no rect', 'Wrong Position', 'Position OK, no width', 'Width est, wrong position'};
         end
@@ -86,9 +86,12 @@ end
 
 %% Let's go through all the files - this is where we link data to images
 if ~Done
- try
+%  try - put back when others are using so that it saves their work
         for i=1:NumberOfTrials
-            i
+%             if GoBack
+%                 i=i-2;
+%             end
+                        i
             ImageFolderName                             = sprintf('%s%c',Obs{i},filesep);
             DataCode                                    = sprintf('%sDataFiles%c%sVD%0.1f_*.mat ',FileRoot, filesep, Obs{i},VD(i));
             flist                                       = dir(DataCode);
@@ -127,14 +130,21 @@ if ~Done
                                 [Outer1, Inner1, WorkingDistance, Eye]  = NewImageAnalysis(Im, VD(i)*100, FOV);
                                 NewSucessfulVD(1,NewImCnt) = calcWD(max([Outer1(3), Outer1(4)]), 3.4, Resolution,FOV);
                                 if Strategy<5 || Strategy==7
-                                    [Result, CorrectPosition]   = CompareDataToImGUINZ(DataFile, Im, Inter(i), Trial(i), SeqInd, FrameList(j), PossErrorTypes, ScoreErrors, OptNames, Outer1, Inner1, WorkingDistance, Eye, FOV);
+                                    [Result, CorrectPosition, GoBack]   = CompareDataToImGUINZ(DataFile, Im, Inter(i), Trial(i), SeqInd, FrameList(j), PossErrorTypes, ScoreErrors, OptNames, Outer1, Inner1, WorkingDistance, Eye, FOV);
+                                    if GoBack==1
+                                        %sort ouf what to do if they choose this!!
+                                    else
                                     [Summary, FrameCounter]     = MakeGUINZSummary(Summary,Result, SimpleCode, DorENum, FrameCounter);
-                                end
+                                    end
+                               end
                             end
                         end
-                        CorrectPositionStore{i,j} = CorrectPosition;
-                        CorrectPositionStore{i,j+3} = SimpleCode;
+                        if ~GoBack
+                            CorrectPositionStore{i,j} = CorrectPosition;
+                            CorrectPositionStore{i,j+3} = SimpleCode;
+                        end
                     end
+                    if ~GoBack
                     WidthSummary(ObsList(i), TrialCnt(i),1)     = (sum(~isnan(DataFile.S_Data.FrameBullsEyeWidthRecord(SeqInd, 1:MaxFrameNumberPerTrial(i)))))/(sum(isnan(DataFile.S_Data.FrameBullsEyeWidthRecord(SeqInd, 1:MaxFrameNumberPerTrial(i)))+(sum(~isnan(DataFile.S_Data.FrameBullsEyeWidthRecord(SeqInd, 1:MaxFrameNumberPerTrial(i))))))); % proportion of frames on one trial, in which a bulls eye estimate was available
                     if ~isnan(WidthSummary(ObsList(i), TrialCnt(i),1))
                         WidthSummary(ObsList(i), TrialCnt(i),2)     = min(DataFile.S_Data.FrameEstimatedDistanceRecord(SeqInd, 1:MaxFrameNumberPerTrial(i)));
@@ -143,11 +153,12 @@ if ~Done
                     if ~isnan(NewWidthSummary(ObsList(i),TrialCnt(i),2))
                         NewWidthSummary(ObsList(i),TrialCnt(i),2)   =  min(NewSucessfulVD(1,:));%proportion correct from new analysis (1/6th of the data goes into the proportion)
                     end
+                    end
                 end
             end
         end
-catch
- end
+% catch
+%  end
     %% Finished with gathering information, now let's save results
     %LISATODO: missing data and image files are limited in number of lines, update this!
     if Strategy<5
