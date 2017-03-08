@@ -14,7 +14,7 @@ else if Legitimacy == 2
     end
 end
 
-if Strategy<5;
+if Strategy<5 
     AnalysisFileRoot            = GetPathSpecificToUser('Desktop','dssr2017-lhamm',AnalysisData, sprintf('%s',StrategyList{Strategy}));
 else
     AnalysisFileRoot            = GetPathSpecificToUser('Desktop','dssr2017-lhamm',AnalysisData);
@@ -24,6 +24,8 @@ if Position==5
     Type=1; % bulls eye
 elseif Position==6
     Type=2; % eye
+else
+    Type=0; %not specified
 end
 
 if Strategy<5 % only get files from the folders with the same strategies
@@ -34,9 +36,8 @@ else %get files from all subfolders
     AnalysisFiles               = result{1};
 end
 
-
 cnt                         = 0;
-if ~isempty(AnalysisFiles)      %check that there is data in the folder
+if ~isempty(AnalysisFiles)     %check that there is data in the folder
     for i=1:length(AnalysisFiles)
         if Strategy<5
             a=importdata(AnalysisFiles(i).name);
@@ -44,38 +45,41 @@ if ~isempty(AnalysisFiles)      %check that there is data in the folder
             a=importdata(strjoin(AnalysisFiles(i)));
         end
         if ~isempty(a)          % check that there is data in the data file
-            for j=1:length(a.data);
-               % if Strategy<5
-                  b=char(a.textdata(j)) ;
-                  if Strategy>=5
-                     c      = char(AnalysisFiles(1));
-                     Type   = c(end-43);  % should be the type which is being coded (BullsEye or Eye)
-                     if Type==1
-                         Position = 5; 
-                     else
-                         Position = 6;
-                     end
-                  end
-               % end
-                cnt=cnt+1;
-                try
-                SumD(cnt,1)=str2double(b(4:10)); SumD(cnt,2) =str2double(b(14:16)); SumD(cnt,3) = str2double(b(21)); SumD(cnt,4) = str2double(b(24:25)); SumD(cnt,Position)=a.data(j,Type); SumD(cnt,7)=str2double(b(end-3:end));
-                catch
-                 SumD(cnt,1)=str2double(b(4:10)); SumD(cnt,2) =str2double(b(14:16)); SumD(cnt,3) = str2double(b(21)); SumD(cnt,4) = str2double(b(24:25)); SumD(cnt,Position)=NaN; SumD(cnt,7)=str2double(b(end-3:end));
-                 
+            if exist('a.data')
+                for j=1:length(a.data);
+                    % if Strategy<5
+                    b=char(a.textdata(j)) ;
+                    if Strategy>=5
+                        c      = char(AnalysisFiles(1));
+                        Type   = c(end-43);  % should be the type which is being coded (BullsEye or Eye)
+                        if Type==1
+                            Position = 5;
+                        else
+                            Position = 6;
+                        end
+                    end
+                    % end
+                    cnt=cnt+1;
+                    try
+                        SumD(cnt,1)=str2double(b(4:10)); SumD(cnt,2) =str2double(b(14:16)); SumD(cnt,3) = str2double(b(21)); SumD(cnt,4) = str2double(b(24:25)); SumD(cnt,Position)=a.data(j,Type); SumD(cnt,7)=str2double(b(end-3:end));
+                    catch
+                        SumD(cnt,1)=str2double(b(4:10)); SumD(cnt,2) =str2double(b(14:16)); SumD(cnt,3) = str2double(b(21)); SumD(cnt,4) = str2double(b(24:25)); SumD(cnt,Position)=NaN; SumD(cnt,7)=str2double(b(end-3:end));
+                        
+                    end
+                    
+                    if Position==5
+                        SumD(cnt,6)=NaN;
+                    elseif Position==6
+                        SumD(cnt,5)=NaN;
+                    end
                 end
-                
-                if Position==5
-                    SumD(cnt,6)=NaN;
-                elseif Position==6
-                    SumD(cnt,5)=NaN;
-                end
+            else
+                % SumD=NaN(1,5);
             end
-        else
-            % SumD=NaN(1,5);
         end
     end
 end
+
 %% now check for missing files: Work on this - it is close, I'm up to line 51
 MissingDataFiles            = dir(sprintf('%sDataAnalysis_%i_%i*DATA.txt',AnalysisFileRoot, Strategy, Type));
 if ~isempty(MissingDataFiles)      %check that there is data in the folder
@@ -128,8 +132,6 @@ if ~exist('SumD','var')
 end
 
 %% now order, and only look at unique files
-
-%SumD=sort(SumD);
 SumD(isnan(SumD)) = Inf; %unique can't deal with NaN, but can with Inf
 SumDUnique=unique(SumD, 'rows');
 % change both back to NaNs

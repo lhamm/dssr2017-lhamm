@@ -16,7 +16,7 @@ LookAtFiles             = 1;    % if 1 will show a summary so far
 ScalingR                = 7.7;  % this is based on Tonga data - could change based on adult experience
 ScalingV                = 14;   % we can figure this out based on Tonga and adult experiment - update for VA analysis!
 CodeImagesAsYouGo       = 1;    % we want to actively code images - will switch off if looking at bulls eye capture rate (strategy 6)
-CorrectPositionStore    = cell(8000, 4);
+
 ScoreErrors             = 0;    % do not score errors, prioritise finding correct location.
 %% Ask user for input
 % Who is the researcher?
@@ -27,40 +27,53 @@ RA                      = ReasearchAssistants{RANum};
 StrategyList            = {'SpecificSample', 'RandGenSample', 'AllNewDetects','OnlyWhenEyeDetected','All Data - just look at VA results', 'All Data - just look at bulleye capture rates', 'CodingCorrect'};
 Strategy                = centmenu('What strategy do you want to take?', StrategyList);
 % If we need it, ask which test we're doing, and how many trials do you want to code?
-if Strategy<5
+if Strategy<5 || Strategy==7
     NumberOfTrials      = GetNumberOfTrials(Strategy);
     DistanceOrEye       = {'BullsEye', 'WhichEye'};
     DorENum             = centmenu('What are tyou looking at?',DistanceOrEye); %1=BullsEye, 2=Eye
     DorE                = DistanceOrEye{DorENum};
     if DorENum==1;
+        if Strategy==7
+            PossErrorTypes  = {'Red Perfect', 'Green Perfect','it''s there, let me show you!','Out of Frame', 'Edge of fram', 'Child obscuring'};
+        else
         PossErrorTypes  = {'Perfect, looks sensible', 'BullsEye out of frame', 'Child obscuring bullsEye', 'BullsEye, but no rect', 'Wrong Position', 'Position OK, no width', 'Width est, wrong position'};
+        end
         Position=5;
     elseif DorENum==2;
         PossErrorTypes  = {'Perfect, CorPatch, CorID', 'BullsEye out of frame','Child obscuring bullsEye', 'CorPatch, WrongID', 'WrongPatch, CorID','WrongPatch, WrongID','No Eye RectWrong', 'No Eye RectCorrect','Eye est, wrong position'};
         Position=6;
+    else
+        
     end
 else
     Position=NaN;
 end
-if Stragety ==7
-    
+
 % Initialise all the counters, folders, etc - no changes should need to be make, just check for accuracy
 InitialiseVariables % This is a script not a function, an alternative would be to put all variables into a structure
 
 %% Look at existing files and choose new ones to code based on input so far
-[SumD, SumDUnique]          = WhatIsDoneAlready(Strategy, StrategyList, Position,1);
+if Strategy==7 %coding correct images
+    FinalTrial                  = GroundTruthStart(Strategy, StrategyList, 1);
+    NewCombinationList          = GroundTruthFinalTrialToNCL(FinalTrial, AllCombinations);
+    CodeImagesAsYouGo           = 1;
+    CorrectPositionStore        = cell((38*8*16*2), 5);
+else   
+[SumD, SumDUnique]              = WhatIsDoneAlready(Strategy, StrategyList, Position,1);
+end
 if Strategy<5 % less than 5 means we are not doing all the files, we want a subset
     if isnan(SumD(1,1))
         NewCombinationList      = AllCombinations; %nothing yet, start with all options
     else
         NewCombinationList      = WhatIsLeftToDo(AllCombinations,SumDUnique); % LISATODO - deal with case - you're done!
     end
-elseif Strategy>=5 % This is the case where we are analysing data without coding any of it on the way - we want all combinations
+elseif Strategy ==5 || Strategy ==6 % This is the case where we are analysing data without coding any of it on the way - we want all combinations
     NewCombinationList         = AllCombinations;
     NumberOfTrials             = size(AllCombinations,1); % need to specify after we know how many files trials there are.
     VAResults                  = NaN((size(NewCombinationList,1)/64), 6,3);
     CodeImagesAsYouGo          = 0; %turn off coding images, just let program do it's thing.
 end
+
 if isempty(NewCombinationList)
     Done=1;
 else
@@ -73,66 +86,67 @@ end
 
 %% Let's go through all the files - this is where we link data to images
 if ~Done
-    for i=1:NumberOfTrials
-        i
-        ImageFolderName                             = sprintf('%s%c',Obs{i},filesep);
-        DataCode                                    = sprintf('%sDataFiles%c%sVD%0.1f_*.mat ',FileRoot, filesep, Obs{i},VD(i));
-        flist                                       = dir(DataCode);
-        NewImCnt                                    = 0;
-        if isempty(flist) % Record missing data files
-            MissDataCnt                             = MissDataCnt+1;
-            MissingDataFiles{MissDataCnt, 1}        = DataCode;
-        else
-            DataFile                                = open(strcat(sprintf('%sDataFiles%c',FileRoot, filesep),(flist(1).name)));
-            if Strategy==5 && mod(i, 64)==0 % 64 Trials is one full data set - now we have a data set and are in the correct indexing position
-                cntVA= cntVA+1;
-                VAResults(cntVA, 1:6,:)             = GetVAFromPal(DataFile, ScalingR, ScalingV);
-            end
-            if Strategy<5 || Strategy==6 % This is used when we want want user input on each image
-                if VD(i)*100==40
-                    Resolution=640; %check
-                elseif VD(i)*100==150
-                     Resolution=1920; %check
+    try
+        for i=1:NumberOfTrials
+            i
+            ImageFolderName                             = sprintf('%s%c',Obs{i},filesep);
+            DataCode                                    = sprintf('%sDataFiles%c%sVD%0.1f_*.mat ',FileRoot, filesep, Obs{i},VD(i));
+            flist                                       = dir(DataCode);
+            NewImCnt                                    = 0;
+            if isempty(flist) % Record missing data files
+                MissDataCnt                             = MissDataCnt+1;
+                MissingDataFiles{MissDataCnt, 1}        = DataCode;
+            else
+                DataFile                                = open(strcat(sprintf('%sDataFiles%c',FileRoot, filesep),(flist(1).name)));
+                if Strategy==5 && mod(i, 64)==0 % 64 Trials is one full data set - now we have a data set and are in the correct indexing position
+                    cntVA= cntVA+1;
+                    VAResults(cntVA, 1:6,:)             = GetVAFromPal(DataFile, ScalingR, ScalingV);
                 end
-                SeqTrialInd                         = find(TrialSeq==Trial(i));
-                SeqInd                              = SeqTrialInd(Inter(i));
-                MaxFrameNumberPerTrial(i)           = find(diff(~isnan(DataFile.S_Data.FrameTimingRecord(SeqInd,:)))==(-1)); %or sum(~isnan(DataFile.S_Data.FrameTimingRecord(InterLoop*TrialLoop,:)));
-                Remainder                           = mod(MaxFrameNumberPerTrial(i)/2,6);
-                FrameList                           = [6, MaxFrameNumberPerTrial(i)/2-Remainder];
-                for j=1:length(FrameList)
-                    SimpleCode                      = sprintf('Obs%s_VD%03dcm_I%i_T%02d_F%04d', Obs{i}, VD(i)*100, Inter(i), Trial(i), FrameList(j));
-                    ImageCode                       = dir(strcat(FileRoot, ImageFolderName,sprintf('%s_%0.1f_%i_%i_%i_*.jpg', Obs{i}, VD(i), Inter(i), Trial(i)-1, FrameList(j))));
-                    if isempty(ImageCode) % Record missing image files
-                        MissImageCnt                        = MissImageCnt+1;
-                        MissingImageFiles{MissImageCnt,:}   = SimpleCode;
-                    else
-                        FullImageName               = GetImageFileName(FileRoot, ImageFolderName, ImageCode(1).name, Strategy, DataFile, SeqInd, FrameList(j));
-                        if ~strcmp(FullImageName, 'NA')
-                            NewImCnt=NewImCnt+1;
-                            Im                      = imread(FullImageName);
-                            [Outer1, Inner1, WorkingDistance, Eye]  = NewImageAnalysis(Im, VD(i)*100, FOV);
-                            NewSucessfulVD(1,NewImCnt) = calcWD(max([Outer1(3), Outer1(4)]), 3.4, Resolution,FOV);
-                            if Strategy<5
-                                [Result, CorrectPosition]   = CompareDataToImGUINZ(DataFile, Im, Inter(i), Trial(i), SeqInd, FrameList(j), PossErrorTypes, ScoreErrors, OptNames, Outer1, Inner1, WorkingDistance, Eye, FOV);
-                                [Summary, FrameCounter]     = MakeGUINZSummary(Summary,Result, SimpleCode, DorENum, FrameCounter);
+                if Strategy<5 || Strategy==7 % This is used when we want want user input on each image
+                    if VD(i)*100==40
+                        Resolution=640; %check
+                    elseif VD(i)*100==150
+                        Resolution=1920; %check
+                    end
+                    SeqTrialInd                         = find(TrialSeq==Trial(i));
+                    SeqInd                              = SeqTrialInd(Inter(i));
+                    MaxFrameNumberPerTrial(i)           = find(diff(~isnan(DataFile.S_Data.FrameTimingRecord(SeqInd,:)))==(-1)); %or sum(~isnan(DataFile.S_Data.FrameTimingRecord(InterLoop*TrialLoop,:)));
+                    Remainder                           = mod(MaxFrameNumberPerTrial(i)/2,6);
+                    FrameList                           = [6, MaxFrameNumberPerTrial(i)/2-Remainder];
+                    for j=1:length(FrameList)
+                        SimpleCode                      = sprintf('Obs%s_VD%03dcm_I%i_T%02d_F%04d', Obs{i}, VD(i)*100, Inter(i), Trial(i), FrameList(j));
+                        ImageCode                       = dir(strcat(FileRoot, ImageFolderName,sprintf('%s_%0.1f_%i_%i_%i_*.jpg', Obs{i}, VD(i), Inter(i), Trial(i)-1, FrameList(j))));
+                        if isempty(ImageCode) % Record missing image files
+                            MissImageCnt                        = MissImageCnt+1;
+                            MissingImageFiles{MissImageCnt,:}   = SimpleCode;
+                        else
+                            FullImageName               = GetImageFileName(FileRoot, ImageFolderName, ImageCode(1).name, Strategy, DataFile, SeqInd, FrameList(j));
+                            if ~strcmp(FullImageName, 'NA')
+                                NewImCnt=NewImCnt+1;
+                                Im                      = imread(FullImageName);
+                                [Outer1, Inner1, WorkingDistance, Eye]  = NewImageAnalysis(Im, VD(i)*100, FOV);
+                                NewSucessfulVD(1,NewImCnt) = calcWD(max([Outer1(3), Outer1(4)]), 3.4, Resolution,FOV);
+                                if Strategy<5 || Strategy==7
+                                    [Result, CorrectPosition]   = CompareDataToImGUINZ(DataFile, Im, Inter(i), Trial(i), SeqInd, FrameList(j), PossErrorTypes, ScoreErrors, OptNames, Outer1, Inner1, WorkingDistance, Eye, FOV);
+                                    [Summary, FrameCounter]     = MakeGUINZSummary(Summary,Result, SimpleCode, DorENum, FrameCounter);
+                                end
                             end
                         end
+                        CorrectPositionStore{i,j} = CorrectPosition;
+                        CorrectPositionStore{i,j+3} = SimpleCode;
                     end
-                    CorrectPositionStore{i,j} = CorrectPosition;
-                    CorrectPositionStore{i,4} = SimpleCode;
+                    WidthSummary(ObsList(i), TrialCnt(i),1)     = (sum(~isnan(DataFile.S_Data.FrameBullsEyeWidthRecord(SeqInd, 1:MaxFrameNumberPerTrial(i)))))/(sum(isnan(DataFile.S_Data.FrameBullsEyeWidthRecord(SeqInd, 1:MaxFrameNumberPerTrial(i)))+(sum(~isnan(DataFile.S_Data.FrameBullsEyeWidthRecord(SeqInd, 1:MaxFrameNumberPerTrial(i))))))); % proportion of frames on one trial, in which a bulls eye estimate was available
+                    if ~isnan(WidthSummary(ObsList(i), TrialCnt(i),1))
+                        WidthSummary(ObsList(i), TrialCnt(i),2)     = min(DataFile.S_Data.FrameEstimatedDistanceRecord(SeqInd, 1:MaxFrameNumberPerTrial(i)));
+                    end
+                    NewWidthSummary(ObsList(i),TrialCnt(i),2)   =  sum(~isnan(NewSucessfulVD(1,:)))/(sum(isnan(NewSucessfulVD(1,:)))+sum(~isnan(NewSucessfulVD(1,:))));%proportion correct from new analysis (1/6th of the data goes into the proportion)
+                    if ~isnan(NewWidthSummary(ObsList(i),TrialCnt(i),2))
+                        NewWidthSummary(ObsList(i),TrialCnt(i),2)   =  min(NewSucessfulVD(1,:));%proportion correct from new analysis (1/6th of the data goes into the proportion)
+                    end
                 end
-                WidthSummary(ObsList(i), TrialCnt(i),1)     = (sum(~isnan(DataFile.S_Data.FrameBullsEyeWidthRecord(SeqInd, 1:MaxFrameNumberPerTrial(i)))))/(sum(isnan(DataFile.S_Data.FrameBullsEyeWidthRecord(SeqInd, 1:MaxFrameNumberPerTrial(i)))+(sum(~isnan(DataFile.S_Data.FrameBullsEyeWidthRecord(SeqInd, 1:MaxFrameNumberPerTrial(i))))))); % proportion of frames on one trial, in which a bulls eye estimate was available
-                if ~isnan(WidthSummary(ObsList(i), TrialCnt(i),1))
-                    WidthSummary(ObsList(i), TrialCnt(i),2)     = min(DataFile.S_Data.FrameEstimatedDistanceRecord(SeqInd, 1:MaxFrameNumberPerTrial(i)));
-                end
-                NewWidthSummary(ObsList(i),TrialCnt(i),2)   =  sum(~isnan(NewSucessfulVD(1,:)))/(sum(isnan(NewSucessfulVD(1,:)))+sum(~isnan(NewSucessfulVD(1,:))));%proportion correct from new analysis (1/6th of the data goes into the proportion)
-                if ~isnan(NewWidthSummary(ObsList(i),TrialCnt(i),2))
-                    NewWidthSummary(ObsList(i),TrialCnt(i),2)   =  min(NewSucessfulVD(1,:));%proportion correct from new analysis (1/6th of the data goes into the proportion)
-                end
-                
-
             end
         end
+    catch
     end
     %% Finished with gathering information, now let's save results
     %LISATODO: missing data and image files are limited in number of lines, update this!
@@ -162,6 +176,12 @@ if ~Done
     elseif Strategy==6
         UniqueMissingDataFiles = unique(MissingDataFiles);
         save(FileNameStrat6, 'WidthSummary','NewWidthSummary','UniqueMissingDataFiles') % These are matlab files - not very future-proof
+    elseif Strategy==7
+        if exist ('UniqueMissingDataFiles', 'var')
+          save(FileNameStrat7, 'CorrectPositionStore', 'UniqueMissingDataFiles');
+        else 
+           save(FileNameStrat7, 'CorrectPositionStore') 
+        end
     end
     
     %% Now let's have a look at the results so far

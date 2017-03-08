@@ -1,4 +1,4 @@
-function [x0,y0,A]= findCentroid(bw_out);
+function [x0,y0,A]= findCentroid(bw_out)
 % uses a black and white image with isolated blobs to find two with closest
 % center points.
 

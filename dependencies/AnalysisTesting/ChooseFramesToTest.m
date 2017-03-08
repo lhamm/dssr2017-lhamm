@@ -24,7 +24,7 @@ elseif Strategy==2 % random
         Inter(i)    = NewCombinationList(Ind(i),3);
         Trial(i)    = NewCombinationList(Ind(i),4);
     end
-elseif Strategy==3 || Strategy==4  || Strategy==5 || Strategy==6 %% sequential
+elseif Strategy==3 || Strategy==4  || Strategy==5 || Strategy==6 || Strategy == 7%% sequential
     for i=1:NumberOfTrials
         Obs{i}      = num2str(NewCombinationList(i,1));
         VD(i)       = NewCombinationList(i,2)./100;

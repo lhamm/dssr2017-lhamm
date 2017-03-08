@@ -10,6 +10,8 @@ elseif Strategy==5
     FileNameStrat5          = sprintf('VAAnalysis_%i_%s_RA_%s.mat', Strategy, MyDate, RA);
 elseif Strategy==6
     FileNameStrat5          = sprintf('BullsEyeSuccessSummary_%i_%s_RA_%s.mat', Strategy, MyDate, RA);
+elseif Strategy ==7
+    FileNameStrat7          = sprintf('CodeCorrectLocation_%i_%s_RA_%s.mat', Strategy, MyDate, RA);
 end
 [Obs, VD, Eyes, Stim]       = GetDataTypeListsGUINZ(FileRoot);
 AllCombinations             = allcomb(str2double(Obs), VD*100, 1:4, 1:16);

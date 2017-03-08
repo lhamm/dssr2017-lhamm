@@ -108,7 +108,7 @@ else %Just want to find bullseye location
             end
         end
         
-        % add text to show BullsEyeWidth, etc?
+        % add text to show BullsEyeWidth, etc.
         UserInput2  = centmenu('Does the blue bullseye look accurate',{'yes','no'});
         %UserInput2 = input('Does that look rigth? (1=yes, 2=No)\n>');
         if UserInput2==1
