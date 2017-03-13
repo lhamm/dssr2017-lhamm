@@ -17,3 +17,8 @@ This project was built and tested on Matlab 2016a on a surface pro4.
 
 ### Contributions
 At this stage, the project is internal, questions and suggestions can be forwarded to l.hamm@auckland.ac.nz
+
+### Licencing
+This work was part of a course, and uses fuctions from a variety of contributors, please contact the email above if you would like to use anything contained within this repository 
+
+Creative commons non-commercial, share alike 
